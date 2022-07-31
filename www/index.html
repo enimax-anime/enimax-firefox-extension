@@ -1,0 +1,85 @@
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link rel="icon" type="image/png" sizes="128x128" href="assets/images/128.png">
+<link rel="icon" type="image/png" sizes="48x48" href="assets/images/48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/images/32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/images/16.png">
+<meta name="theme-color" content="#4b4bc2">
+<title>Enimax</title>
+
+<link href="notification/noti.css" rel="stylesheet">
+<script type="text/javascript" src="assets/dexie.js"></script>
+<script type="text/javascript" src="assets/dexie-export-import.js"></script>
+
+<script type="text/javascript" src="assets/socket.js"></script>
+<script type="text/javascript" src="notification/noti.js"></script>
+<script type="text/javascript" src="extensions/index.js"></script>
+<script type="text/javascript" src="assets/m3u8-parser.js"></script>
+<script type="text/javascript" src="storage/index.js"></script>
+<script type="text/javascript" src="storage/download.js"></script>
+
+
+<style>
+    iframe {
+        padding: 0;
+        margin: 0;
+        border: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        z-index: 0;
+    }
+
+    #player {
+        padding: 0;
+        margin: 0;
+        border: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+        height: 100%;
+        width: 100%;
+        z-index: 1;
+
+    }
+
+    .pop{
+
+        bottom: 0 !important;
+        top: auto !important;
+        left:0 !important;
+        width: 100% !important;
+        height:  200px !important;
+				
+    }
+</style>
+
+
+
+
+<body>
+    <div id="noti_con"></div>
+
+    <iframe src="" id="frame"></iframe>
+    <iframe src="fallback.html" id="player" ></iframe>
+
+
+
+
+
+
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="assets/bridge.js"></script>
+
+
+
+
+
+
+</body>
+
+</html>

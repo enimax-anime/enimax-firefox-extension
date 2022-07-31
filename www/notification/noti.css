@@ -1,0 +1,168 @@
+#noti_con::-webkit-scrollbar {
+
+    width: 0;
+}
+
+body{
+    font-size: 15px;
+}
+
+#noti_con {
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 400px;
+    max-width: 100%;
+
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    z-index: 400;
+
+    max-height: 100%;
+}
+
+a {
+    color: white !important;
+}
+
+.noti {
+    width: calc(100% - 20px);
+    font-size: 15px;
+    border-radius: 10px;
+    min-height: 100px;
+    margin: 10px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(calc(-100% - 20px));
+    animation-name: enter;
+    animation-duration: 0.2s;
+    animation-timing-function: ease-in;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    flex-direction: column;
+    overflow: hidden;
+
+}
+
+@keyframes enter {
+
+    0% {
+        transform: translateX(calc(100% + 20px));
+
+    }
+
+    100% {
+        transform: translateX(0px);
+
+    }
+
+}
+
+.noti_head {
+    color: white;
+    text-align: left;
+    color: white;
+    text-align: left;
+    width: 100%;
+    padding: 20px;
+    padding-bottom: 0px;
+    box-sizing: border-box;
+}
+
+.noti_data {
+    color: white;
+    text-align: left;
+    color: white;
+    text-align: left;
+    width: 100%;
+    padding: 20px;
+    padding-top: 10px;
+    box-sizing: border-box;
+}
+
+
+.dot {
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    /*position: relative;*/
+
+}
+
+.dot::after {
+    content: '\02715';
+    font-size: 10px;
+    /*line-height: 100px;*/
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.timer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: white;
+
+    animation-name: timerNoti;
+    animation-timing-function: linear;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+
+}
+
+@keyframes timerNoti {
+
+    0% {
+        width: 100%;
+
+    }
+
+    100% {
+        width: 0;
+    }
+
+}
+
+
+
+#color_con {
+    height: 80px;
+    display: block;
+    text-align: center;
+    text-align: center;
+    color: black;
+    background: #212121;
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+}
+
+
+
+.redNoti {
+    background: linear-gradient(to bottom left, #843f6c 40%, #bf4277 100%);
+}
+
+.blueNoti {
+    background: linear-gradient(to bottom left, #4561c9 40%, #508396 100%);
+
+}

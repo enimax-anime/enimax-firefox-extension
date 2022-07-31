@@ -1,0 +1,145 @@
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="notification/noti.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #4b4bc2;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 800'%3E%3Cg %3E%3Ccircle fill='%23ffffff22' cx='400' cy='400' r='600'/%3E%3Ccircle fill='%2300000022' cx='400' cy='400' r='500'/%3E%3Ccircle fill='%2300000022' cx='400' cy='400' r='400'/%3E%3Ccircle fill='%23ffffff22' cx='400' cy='400' r='300'/%3E%3Ccircle fill='%23ffffff22' cx='400' cy='400' r='200'/%3E%3Ccircle fill='%23ffffff22' cx='400' cy='400' r='100'/%3E%3C/g%3E%3C/svg%3E");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+
+
+        }
+
+        #container {
+            background-color: rgba(0, 0, 0, 0.4);
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #title {
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            font-size: 50px;
+        }
+
+        .box_input {
+            height: 45px;
+            max-width: 400px;
+            width: calc(100% - 50px);
+            outline: none;
+            border: 0;
+            border-radius: 45px;
+            margin-top: 30px;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            padding: 30px;
+            font-size: 17px;
+            font-family: 'Montserrat', sans-serif;
+
+
+            -webkit-transition-duration: 0.2s;
+
+            -o-transition-duration: 0.2s;
+
+            transition-duration: 0.2s;
+
+
+            background: rgb(255, 255, 255, 0.78);
+            -webkit-box-shadow: 6px 7px 0px 0px #2f2c42;
+            box-shadow: 6px 7px 0px 0px #2f2c42;
+            color: black;
+        }
+
+
+        .box_input:focus {
+            /*background: rgb(255,255,255,0.78);*/
+            -webkit-box-shadow: 0px 0px 0px 7px #ffffff;
+            box-shadow: 0px 0px 0px 7px #ffffff;
+
+
+        }
+
+        .inputCon {
+            text-align: center;
+            width: 100%;
+        }
+
+        .submit {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border-radius: 0;
+            margin-top: 40px;
+            border: 0;
+            outline: 0;
+            padding: 15px;
+            padding-left: 25px;
+            padding-right: 25px;
+            font-family: 'Montserrat', sans-serif;
+
+            border-radius: 20px;
+            background: white;
+            color: black;
+            font-size: 14px;
+            -webkit-box-shadow: 4px 4px 0px 0px #2f2c42;
+            box-shadow: 4px 4px 0px 0px #2f2c42;
+            -webkit-transition-duration: 0.2s;
+            -o-transition-duration: 0.2s;
+            transition-duration: 0.2s;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+
+        .submit:hover {
+            -webkit-box-shadow: 0px 0px 0px 7px #ffffff;
+            box-shadow: 0px 0px 0px 7px #ffffff;
+
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="noti_con"></div>
+        <div id="title">Reset</div>
+        <div class="inputCon"><input type="password" class="box_input" placeholder="Enter your old password"
+                id="oldPassword">
+        </div>
+        
+
+        <div class="inputCon"><input type="password" class="box_input" placeholder="Enter your new password"
+                id="newPassword"></div>
+
+        <div class="inputCon"><input type="password" class="box_input" placeholder="Enter your new password again"
+            id="confirmNewPassword">
+        </div>
+        
+        <div class="inputCon"><input type="button" class="submit" value="Submit" id="submit"></div>
+    </div>
+
+    <script type="text/javascript" src="notification/noti.js"></script>
+    <script type="text/javascript" src="extensions/index.js"></script>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="assets/reset.js"></script>
+    
+</body>
+
+</html>

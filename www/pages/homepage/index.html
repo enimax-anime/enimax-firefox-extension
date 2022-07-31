@@ -1,0 +1,144 @@
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link href="../../notification/noti.css" rel="stylesheet">
+  <link href="../../assets/index.css" rel="stylesheet">
+  <link href="index.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800;900&display=swap"
+    rel="stylesheet">
+
+
+  <script type="text/javascript" src="../../notification/noti.js"></script>
+  <script type="text/javascript" src="../../assets/dexie.js"></script>
+  <script type="text/javascript" src="../../assets/index.js"></script>
+
+</head>
+
+<body>
+  <div class="con_black"></div>
+  <div id="con_11">
+
+
+    <div id="menuIcon" data-open="0">
+      <div class="bar1"></div>
+      <div class="bar2"></div>
+      <div class="bar3"></div>
+    </div>
+
+
+    <div id="menuBg"></div>
+    <div id="menu">
+      <div class="menuItem" id="retry">Reload</div>
+      <div class="menuItem" id="searchIcon">Search</div>
+      <div class="menuItem" id="reset">Reset password</div>
+      <div class="menuItem" id="add_room">Add categories</div>
+      <div class="menuItem" id="show_room">Reorder categories</div>
+      <div class="menuItem" id="queueOpen">Download Queue</div>
+      <div class="menuItem" id="restoreData">Restore Data</div>
+      <div class="menuItem" id="accessability">Accessability</div>
+      <div class="menuItem" id="changeServerDiv">Change server</div>
+      <div class="menuItem" id="logout">Log out</div>
+    </div>
+
+
+    <div id="noti_con"></div>
+    <div id="coverDiv"></div>
+    <div id="coverDiv2"></div>
+
+
+    <div id="room_con" class="con_main">
+      <div class="close_con closeDom"></div>
+      <div class="input_con">
+        <input type="text" id="pass_f" class="box_input" placeholder="Enter the category name here.">
+        <div class="submit_pass" id="addRoom" style="vertical-align: middle;margin-left: -20px;"></div>
+      </div>
+    </div>
+
+    <div id="room_dis" class="con_main">
+      <div class="close_con" id="closeRoom"></div>
+      <button class="save_button" id="saveRoom">Save</button>
+      <div class="input_con drag-sort-enable" id="room_dis_child"></div>
+    </div>
+
+
+    <div id="room_add_show" class="con_main">
+      <div class="close_con closeDom"></div>
+      <div class="input_con" id="room_add_child"></div>
+    </div>
+
+
+    <div id="changeServerMain" class="con_main">
+      <div class="close_con closeDom"></div>
+
+      <div style="width:100%;text-align:center;color:white;">
+        Local: &nbsp;&nbsp;
+        <label class="switch" style="vertical-align: middle;">
+          <input type="checkbox" id="local">
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+
+
+    <div id="queueCon" class="con_main" style="white-space: normal;">
+      <div class="close_con closeDom"></div>
+
+      <div id="queueButton" class="queuePause" data-paused="false"></div>
+
+
+      <div style="color:white;font-size: 30px;">
+        <div class="queueRemove" id="activeRemove"></div> Active Queue
+      </div>
+      <div id="activeCon"></div>
+
+      <div style="color:white;font-size: 30px;">
+        <div class="queueRemove" id="doneRemove"></div> Done Queue
+      </div>
+      <div id="doneCon"></div>
+    </div>
+
+    <div id="accessabilityCon" class="con_main" style="white-space: normal;color: white;flex-direction: column; justify-content: center;">
+      <div class="close_con closeDom"></div>
+      <div class="accessItem"> Outline Color : &nbsp;&nbsp;<input type="color" id="outlineColor"></div>
+
+      <div class="accessItem"> Outline Width : &nbsp;&nbsp;<input type="text"  id="outlineWidth"></div>
+
+      <div class="accessItem"> Theme Color : &nbsp;&nbsp;<input type="color" id="themeColor"></div>
+
+    </div>
+
+
+
+    <div id="home">
+
+
+      <div style="color: white;text-align: left;margin: 20 20px 0px 20px;display: none;" id="offlineCon">
+        Offline Mode: &nbsp;&nbsp;
+        <label class="switch" style="vertical-align: middle;">
+          <input type="checkbox" id="offline">
+          <span class="slider round"></span>
+        </label>
+
+        <div class="downloadButton" id="resetSource" style="display:none; margin-top:15px;">Reset source preference
+        </div>
+        <div class="downloadButton" id="resetQuality" style="display:none; margin-top:15px;">Reset quality preference
+        </div>
+      </div>
+
+      <div class="title_a">Recently Watched</div>
+      <div id="recently" class="card_con"></div>
+      <div style="width:100%;" id="custom_rooms"></div>
+    </div>
+
+  </div>
+
+  <script type="text/javascript" src="../../assets/Sortable.js"></script>
+  <script type="text/javascript" src="../../extensions/index.js"></script>
+  <script type="text/javascript" src="index.js"></script>
+
+
+
+</body>
+
+</html>

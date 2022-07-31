@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link href="index.css" rel="stylesheet">
+	<link href="../../notification/noti.css" rel="stylesheet">
+	<link href="../../assets/index.css" rel="stylesheet">
+	<script src="../../assets/socket.js" ></script>
+
+	<script type="text/javascript" src="../../extensions/index.js"></script>
+	<script src="../../assets/hls.js"></script>
+	<script type="text/javascript" src="../../notification/noti.js"></script>
+	<script type="text/javascript" src="../../assets/index.js"></script>
+
+	<script type="text/javascript" src="../../assets/dexie.js"></script>
+	<script type="text/javascript" src="../../storage/index.js"></script>
+
+</head>
+
+<body>
+	<div id="con">
+
+		<div class="overlay" id="seek_overlay"></div>
+		<div id="noti_con"></div>
+		<div  id="lock_2"></div>
+
+
+
+		<div id="con_2">
+			<div id="setting_con">
+				<div style="width: 20px;position: absolute;top: 0;display: inline-block;font-size: 20px;color: white;text-align: right;top: 10px;right: 10px;box-sizing: border-box;z-index: 5;" 	id="closeSetting">&#10005;</div>
+
+				<div style="width:100%;padding: 30px; box-sizing: border-box;" id="setting_con_main">
+
+					<div id="qualityTitle" class="settingTitle">Quality: </div>
+					<div id="hls_con" class="bottomMargin"></div>
+					<hr id="qualityHr" class="divider" />
+
+
+					<div id="sourceTitle" class="settingTitle" style="display: block !important">Source: </div>
+					<div id="quality_con" class="bottomMargin"></div>
+					<hr id="sourceHr" class="divider" />
+					
+
+					<div id="subtitleTitle" class="settingTitle">Subtitles: </div>
+					<div id="sub_con" class="bottomMargin"></div>
+					<hr id="subtitleHr" class="divider" />
+
+
+					<div style="display: inline-block;" class="bottomMargin">
+						<span style="color:white;display: inline-block;vertical-align: middle;margin-right: 15px;">Autoplay
+							: </span>
+						<label class="switch" style="vertical-align: middle;">
+							<input type="checkbox" id="autoplay">
+							<span class="slider round"></span>
+						</label>
+					</div>
+
+
+					<div style="display: inline-block;" class="bottomMargin">
+
+						<span style="color:white;display: inline-block;vertical-align: middle;margin-right: 15px;">Rewatch mode
+							: </span>
+						<label class="switch" style="vertical-align: middle;">
+							<input type="checkbox" id="rewatch">
+							<span class="slider round"></span>
+						</label>
+					</div>
+
+					<hr class="divider" />
+
+
+					<div id="sourceTitle" class="settingTitle" style="display: block !important">Fill mode: </div>
+
+					<div id="playerFit" class="bottomMargin">
+						<div class="qual fit" data-num = "0">
+							Normal
+						</div>
+						<div class="qual fit" data-num = "1">
+							Stretch
+						</div>
+						<div class="qual fit" data-num = "2">
+							Subtitles
+						</div>
+						<div class="qual fit" data-num = "3">
+							Fill
+						</div>
+					</div>
+
+					<hr class="divider" />
+
+
+					
+				</div>
+			</div>
+			<video id="v" playsinline poster="../../assets/images/anime2.png">
+			</video>
+			
+			<div id="pop">
+
+				<div style="width: 100%;font-size: 25px;color: white;font-weight: bolder;text-align: left;	box-sizing: border-box;	margin: 15px 0px 0px 25px;" id="epCon">
+					Episode <span id="ep_dis"></span>
+				</div>
+
+
+				
+
+			</div>
+			<div id="options">
+				<div style="display: table-cell;vertical-align: middle;">
+					<div id="fullscreenToggle" style="display: none;"></div>
+				</div>
+				<div style="display: table-cell;vertical-align: middle;">
+					<div id="fastFor" style="display: none;"></div>
+				</div>
+				<div style="display: table-cell;vertical-align: middle;">
+					<div id="retry"></div>
+				</div>
+				<div style="display: table-cell;vertical-align: middle;">
+					<div id="pip"></div>
+				</div>
+
+				<div style="display: table-cell;vertical-align: middle;">
+
+
+					<div id="setting_icon"></div>
+
+				</div>
+			</div>
+			<div style="position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);transition-duration: 0.2s;height: 120px;width: 120px;"
+				id="big_play" class="play_bg controlTop">
+
+			</div>
+
+			<div id="prev_ep" style="position:absolute;top: 50%;left: 20%;transform: translate(-50%,-50%);"
+				class="controlTop">
+
+				<img src="../../assets/images/next.png" style="height: 35px;width: 35px;transform: rotate(180deg);">
+			</div>
+			<div id="next_ep" style="position:absolute;top: 50%;left: 80%;transform: translate(-50%,-50%);"
+				class="controlTop">
+				<img src="../../assets/images/next.png" style="height: 35px;width: 35px;transform: rotate(0deg);">
+
+			</div>
+
+			<div id="bar_con">
+
+				<div id="spot_bar"
+					style="width: 100%;height: 100%;display: table;background-color: rgba(0,0,0,0);border-radius: 100px;">
+
+					<div style="display: table-cell;vertical-align: middle;">
+						<div class="replay" id="repBack"></div>
+					</div>
+
+
+					<div style="display: table-cell;vertical-align: middle;font-weight: bolder;">
+						<div id="time"><span id="current"></span>/<span id="total">...</span></div>
+					</div>
+
+					<div style="display: table-cell;vertical-align: middle;">
+						<div class="replay rotated" id="repForward"></div>
+
+					</div>
+
+					<div style="display: table-cell;width: 100%;vertical-align: middle;position: relative;"
+						id="bar_con1">
+						<div id="seeker">00:00</div>
+
+						<div id="bar">
+							<div id="buffered"></div>
+
+							<div id="bar_main"></div>
+							<div id="loaded"></div>
+						</div>
+					</div>
+					
+
+					<div style="display: table-cell;vertical-align: middle;">
+						<div id="fullscreen"></div>
+					</div>
+
+
+
+					
+
+
+
+					<div style="display: table-cell;vertical-align: middle;">
+						<div id="lock"></div>
+					</div>
+
+
+				</div>
+			</div>
+
+			<div id="popOut"></div>
+
+		</div>
+	</div>
+
+
+	<script type="text/javascript" src="index.js"></script>
+
+
+</body>
