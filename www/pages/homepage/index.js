@@ -12,129 +12,138 @@ function resetOfflineQual() {
     }
 }
 
-document.getElementById("resetQuality").onclick = function(){
+document.getElementById("resetQuality").onclick = function () {
     resetOfflineQual();
 }
 
-document.getElementById("accessability").onclick = function(){
+document.getElementById("accessability").onclick = function () {
     document.getElementById("accessabilityCon").style.display = "flex";
 }
 
 
 
-document.getElementById("restoreData").onclick = function(){
+document.getElementById("restoreData").onclick = function () {
     let res = prompt("Are you sure you want to do this? Doing this multiple time may result in duplication of your local data. Type \"YES\" to proceed.")
 
-    if(res === "YES"){
+    if (res === "YES") {
         window.parent.dexieToSQLite();
-    }else{
+    } else {
         alert("Aborting");
     }
 }
 
 
-document.getElementById("queueButton").setAttribute("data-paused",(localStorage.getItem("downloadPaused") === 'true').toString());
+document.getElementById("queueButton").setAttribute("data-paused", (localStorage.getItem("downloadPaused") === 'true').toString());
 
-if(document.getElementById("queueButton").getAttribute("data-paused") === 'true'){
+if (document.getElementById("queueButton").getAttribute("data-paused") === 'true') {
     document.getElementById("queueButton").className = "queuePlay";
-}else{
+} else {
     document.getElementById("queueButton").className = "queuePause";
 
 }
 
-document.getElementById("queueButton").onclick = function(){
+document.getElementById("queueButton").onclick = function () {
     let downloadQueue = window.parent.returnDownloadQueue();
-    if(document.getElementById("queueButton").getAttribute("data-paused") === 'true'){
+    if (document.getElementById("queueButton").getAttribute("data-paused") === 'true') {
         let bool = downloadQueue.playIt(downloadQueue);
-        if(bool){
+        if (bool) {
             document.getElementById("queueButton").className = "queuePause";
             document.getElementById("queueButton").setAttribute("data-paused", "false");
         }
-    }else{
+    } else {
         let bool = downloadQueue.pauseIt(downloadQueue);
-        if(bool){
+        if (bool) {
             document.getElementById("queueButton").className = "queuePlay";
             document.getElementById("queueButton").setAttribute("data-paused", "true");
 
         }
-    
+
     }
 };
 
-document.getElementById("activeRemove").onclick = function(){
+document.getElementById("activeRemove").onclick = function () {
     let downloadQueue = window.parent.returnDownloadQueue();
-    downloadQueue.removeActive(downloadQueue); 
+    downloadQueue.removeActive(downloadQueue);
 }
 
 
-document.getElementById("doneRemove").onclick = function(){
+document.getElementById("doneRemove").onclick = function () {
     let downloadQueue = window.parent.returnDownloadQueue();
-    downloadQueue.removeDone(downloadQueue); 
+    downloadQueue.removeDone(downloadQueue);
 }
 
-if(config.chrome){
+if (config.chrome) {
     document.getElementById("queueOpen").style.display = "none";
     document.getElementById("restoreData").style.display = "none";
 }
 
-function addQueue(queue, queueDOM, downloadQueue, isDone){
-  
+function addQueue(queue, queueDOM, downloadQueue, isDone) {
 
-    if(queue.length == 0 ){
+
+    if (queue.length == 0) {
         queueDOM.append(createElement(
             {
-                "style" : {
-                    "color" : "white",
-                    "fontSize" : "15px",
-                    "margin" : "10px 0 30px 0",
+                "style": {
+                    "color": "white",
+                    "fontSize": "15px",
+                    "margin": "10px 0 30px 0",
                 },
-                "innerText" : "Empty"
+                "innerText": "Empty"
             }
         ));
     }
-    for(let i = 0; i < queue.length; i++){
+    for (let i = 0; i < queue.length; i++) {
         let temp = createElement(
-                {
-                    "element" : "div", "class" : "episodesCon", 
-                    "attributes" : {
-                        "data-url" : queue[i].data
-                    },
-                   
-                }
-            );
+            {
+                "element": "div", "class": "episodesCon",
+                "attributes": {
+                    "data-url": queue[i].data
+                },
 
-        let temp2 = createElement({"element" : "div", "class" : "queueMessageCon"});
-        
+            }
+        );
 
-        let temp3 = createElement({"element" : "div", "innerText" : queue[i].message, "class": "queueMessage"});
-        let temp4 = createElement({"element" : "div", "class": "episodesDownloaded", "attributes" : {
-            "data-url" : queue[i].data
-        }});
+        let temp2 = createElement({ "element": "div", "class": "queueMessageCon" });
 
-        temp4.onclick = function(){
-            if(isDone){
+
+        let temp3 = createElement({ "element": "div", "innerText": queue[i].message, "class": "queueMessage" });
+        let temp4 = createElement({
+            "element": "div", "class": "episodesDownloaded", "attributes": {
+                "data-url": queue[i].data
+            }
+        });
+
+        temp4.onclick = function () {
+            if (isDone) {
                 downloadQueue.removeFromDoneQueue(this.getAttribute("data-url"));
 
-            }else{
+            } else {
                 downloadQueue.removeFromQueue(this.getAttribute("data-url"));
 
             }
-            
+
         }
         let downloadPercent;
 
-        try{
+        try {
             let temp = downloadQueue.queue[0].downloadInstance;
             downloadPercent = temp.downloaded / temp.total;
-            downloadPercent = Math.floor(downloadPercent * 10000)/100;
-        }catch(err){
+            downloadPercent = Math.floor(downloadPercent * 10000) / 100;
+        } catch (err) {
 
         }
-        let temp5 = createElement({"element" : "div", "innerHTML" : `${queue[i].title + " - "}${queue[i].anime.name.trim()} <span id="downloadingPercent">${(downloadPercent !== undefined && !isDone && i === 0) ?  " - " + downloadPercent + "%" : ""}</span>` });
+
+
+        let temp5 = createElement({ "element": "div", "innerHTML": `${queue[i].title} - ${queue[i].anime.name.trim()}` });
 
         temp.append(temp2);
         temp.append(temp4);
         temp2.append(temp5);
+
+        if (!isDone && i === 0) {
+            temp3.id = "downloadingPercent";
+
+        }
 
 
         temp2.append(temp3);
@@ -144,58 +153,60 @@ function addQueue(queue, queueDOM, downloadQueue, isDone){
 
 
 
-function reloadQueue(mode = 0){
+function reloadQueue(mode = 0) {
     let downloadQueue = window.parent.returnDownloadQueue();
 
-    if(mode == 0 || mode == 1){
+    if (mode == 0 || mode == 1) {
         let queueDOM = document.getElementById("activeCon");
         queueDOM.innerHTML = "";
         let queue = downloadQueue.queue;
         addQueue(queue, queueDOM, downloadQueue, false);
     }
-    
 
-    if(mode == 0 || mode == 2){
+
+    if (mode == 0 || mode == 2) {
         let doneQueueDOM = document.getElementById("doneCon");
         doneQueueDOM.innerHTML = "";
         let doneQueue = downloadQueue.doneQueue;
         addQueue(doneQueue, doneQueueDOM, downloadQueue, true);
     }
-    
+
 }
 
 
 
 
-document.getElementById("queueOpen").onclick = function(){
+document.getElementById("queueOpen").onclick = function () {
+    document.getElementById("queueCon").setAttribute("data-conopen", "true");
+
     document.getElementById("queueCon").style.display = "block";
     reloadQueue();
 }
 
 
 
-if(!config.chrome){
+if (!config.chrome) {
     document.getElementById("offlineCon").style.display = "block";
 }
 
-if(localStorage.getItem("offline") === 'true'){
-    document.getElementById("resetSource").style.display = "inline-block";
-    document.getElementById("resetQuality").style.display = "inline-block";
+if (localStorage.getItem("offline") === 'true') {
+    document.getElementById("resetSource").style.display = "block";
+    document.getElementById("resetQuality").style.display = "block";
     document.getElementById("searchIcon").style.display = "none";
 
-    
+
 
 }
 
-document.getElementById("resetSource").onclick = function(){
+document.getElementById("resetSource").onclick = function () {
     let message = `What extension's source do you want to reset?\n`;
-    for(let i = 0; i < extensionNames.length; i++){
-        message +=  `${i}. ${extensionNames[i]}\n`;
+    for (let i = 0; i < extensionNames.length; i++) {
+        message += `${i}. ${extensionNames[i]}\n`;
     }
 
-    while(true){
+    while (true) {
         let res = parseInt(prompt(message));
-        if(res >= 0 && res < extensionNames.length){
+        if (res >= 0 && res < extensionNames.length) {
             localStorage.removeItem(`${res}-downloadSource`);
             break;
         }
@@ -210,13 +221,13 @@ offlineDOM.onchange = function () {
 
     if (val == "false") {
         localStorage.setItem("offline", "false");
-        window.location = "index.html";
+        window.parent.postMessage({ "action": 500, data: "pages/homepage/index.html" }, "*");
     } else {
         if (isNaN(parseInt(localStorage.getItem("offlineQual")))) {
             resetOfflineQual();
         }
         localStorage.setItem("offline", "true");
-        window.location = "index.html";
+        window.parent.postMessage({ "action": 500, data: "pages/homepage/index.html" }, "*");
 
     }
 };
@@ -231,7 +242,8 @@ async function logout() {
         sendNoti([2, "", "Alert", "Trying to log you out..."]);
 
         await window.parent.makeRequest("POST", `${config.remote}/logout`, {});
-        location.reload();
+        window.parent.postMessage({ "action": 500, data: "pages/homepage/index.html" }, "*");
+
     } catch (err) {
         sendNoti([2, "red", "Error", err]);
 
@@ -245,11 +257,13 @@ if (config.local || localStorage.getItem("offline") === 'true') {
 
 
 document.getElementById("retry").addEventListener("click", function () {
-    location.reload();
+    window.parent.postMessage({ "action": 500, data: "pages/homepage/index.html" }, "*");
+
 });
 
 document.getElementById("searchIcon").addEventListener("click", function () {
-    window.location = '../search/index.html';
+    window.parent.postMessage({ "action": 500, data: "pages/search/index.html" }, "*");
+
 });
 
 document.getElementById("add_room").addEventListener("click", function () {
@@ -286,6 +300,11 @@ for (let i = 0; i < tempCloseDom.length; i++) {
 document.getElementById("closeRoom").onclick = function () {
     hide_dom2(this);
 };
+document.getElementById("closeDomQueue").onclick = function () {
+    hide_dom(this);
+    document.getElementById("queueCon").setAttribute("data-conopen", "false");
+}
+
 
 document.getElementById("addRoom").onclick = function () {
     ini_api.add_room();
@@ -296,22 +315,30 @@ document.getElementById("saveRoom").onclick = function () {
 };
 
 
-document.getElementById("outlineColor").onchange = function(){
+document.getElementById("outlineColor").onchange = function () {
     localStorage.setItem("outlineColor", this.value);
 }
 
 
-document.getElementById("outlineWidth").onchange = function(){
+document.getElementById("outlineWidth").onchange = function () {
     localStorage.setItem("outlineWidth", this.value);
 }
 
-document.getElementById("themeColor").onchange = function(){
+document.getElementById("themeColor").onchange = function () {
     localStorage.setItem("themecolor", this.value);
 }
 
-document.getElementById("outlineColor").value =  localStorage.getItem("outlineColor");
-document.getElementById("outlineWidth").value =  localStorage.getItem("outlineWidth");
-document.getElementById("themeColor").value =  localStorage.getItem("themecolor");
+document.getElementById("scrollBool").onchange = function () {
+    localStorage.setItem("scrollBool", this.checked.toString());
+}
+
+
+document.getElementById("outlineColor").value = localStorage.getItem("outlineColor");
+document.getElementById("outlineWidth").value = localStorage.getItem("outlineWidth");
+document.getElementById("themeColor").value = localStorage.getItem("themecolor");
+document.getElementById("scrollBool").checked = localStorage.getItem("scrollBool") !== "false";
+
+
 
 document.getElementById("reset").addEventListener("click", function () {
     window.parent.postMessage({ "action": 22, data: "" }, "*");
@@ -372,14 +399,21 @@ window.onmessage = function (x) {
             getUserInfo();
 
         }
-    }else if(x.data.action == "activeUpdate"){
-        reloadQueue(1);
-    }else if(x.data.action == "doneUpdate"){
-        reloadQueue(2);
-    }
-    else if(x.data.action == "percentageUpate"){
-        if(document.getElementById("downloadingPercent")){
-            document.getElementById("downloadingPercent").innerText = " - " +x.data.data +"%";
+    } else if (document.getElementById("queueCon").getAttribute("data-conopen") == "true") {
+        if (x.data.action == "activeUpdate") {
+            reloadQueue(1);
+        } else if (x.data.action == "doneUpdate") {
+            reloadQueue(2);
+        }
+        else if (x.data.action == "percentageUpate") {
+            if (document.getElementById("downloadingPercent")) {
+                if (parseInt(x.data.data) == 100) {
+                    document.getElementById("downloadingPercent").innerText = "Storing the downloaded data...";
+
+                } else {
+                    document.getElementById("downloadingPercent").innerText = x.data.data + "%";
+                }
+            }
         }
     }
 };
@@ -416,10 +450,12 @@ function open_menu(x) {
     let state = x.parentElement.getAttribute("data-state-menu");
     if (state == "open") {
         x.parentElement.style.width = "40px";
+        x.parentElement.style.zIndex = "0";
         x.parentElement.setAttribute("data-state-menu", "closed");
         x.style.transform = "rotate(0deg)";
     } else {
         x.parentElement.style.width = "auto";
+        x.parentElement.style.zIndex = "99";
         x.parentElement.setAttribute("data-state-menu", "open");
         x.style.transform = "rotate(45deg)";
 
@@ -614,37 +650,96 @@ function addCustomRoom() {
 
     rooms2 = rooms.slice(0);
     document.getElementById("custom_rooms").innerHTML = "";
+    document.getElementById("categoriesCon").innerHTML = `
+    <div id="catActive">
+        <div style="position: absolute;background: red;" id="catActiveMain"></div>
+    <div>`;
+
+    function createCat(dataId, dataText) {
+        return createElement({
+            "class": `categories${(localStorage.getItem("currentCategory") === dataId) ? " activeCat" : ""}`,
+            "attributes": {
+                "data-id": dataId
+            },
+            "listeners": {
+                "click": function () {
+
+
+                    let thisDataId = this.getAttribute("data-id");
+                    localStorage.setItem("currentCategory", thisDataId);
+
+
+                    let tempCat = document.getElementsByClassName("categories");
+                    for (let i = 0; i < tempCat.length; i++) {
+                        if (this == tempCat[i]) {
+                            tempCat[i].classList.add("activeCat");
+                        } else {
+                            tempCat[i].classList.remove("activeCat");
+                        }
+
+
+                    }
+
+
+                    let activeCatDOM = document.querySelector(".categories.activeCat");
+                    let temp = document.getElementById("catActiveMain");
+                    window.requestAnimationFrame(function () {
+                        window.requestAnimationFrame(function () {
+                            if (temp && activeCatDOM) {
+                                temp.style.left = activeCatDOM.offsetLeft;
+                                temp.style.height = activeCatDOM.offsetHeight;
+                                temp.style.width = activeCatDOM.offsetWidth;
+                            }
+
+                            setTimeout(function(){
+                                let tempCatData = document.getElementsByClassName("categoriesDataMain");
+                                for (let i = 0; i < tempCatData.length; i++) {
+                                    if (tempCatData[i].id == thisDataId) {
+                                        tempCatData[i].classList.add("active");
+    
+                                    } else {
+                                        tempCatData[i].classList.remove("active");
+    
+                                    }
+                                }
+                            }, 200);
+                            
+                        });
+                    });
+
+                }
+            }, "innerText": dataText
+        });
+    }
+
+    let tempRecent = createCat("room_recently", "Recently Watched");
+    tempRecent.id = "recentlyCat";
+    document.getElementById("categoriesCon").append(tempRecent);
+
+
+    document.getElementById("custom_rooms").append(createElement({
+        "class": `categoriesDataMain${(localStorage.getItem("currentCategory") === "room_recently") ? " active" : ""}`,
+        "id": `room_recently`
+    }));
 
     for (var i = 0; i < rooms_order.length; i++) {
 
         let yye = rooms2.indexOf(rooms_order[i]);
         if (yye > -1) {
 
+            let roomID = `room_${rooms2[yye]}`;
+            let tempDiv = createElement({
+                "class": `categoriesDataMain${(localStorage.getItem("currentCategory") === roomID) ? " active" : ""}`,
+                "id": roomID
+            });
+
+            let tempDiv2 = createCat(roomID, rooms2[yye - 1]);
 
 
-            let tempDiv = createElement({ "class": "room_con_1", "attributes": {}, "listeners": {} });
-
-            let tempDiv2 = createElement({ "class": "title_a_2", "attributes": { "data-hello": `""""""` }, "listeners": {}, "innerText": rooms2[yye - 1] });
-
-
-            let tempDiv3 = createElement({ "class": "card_con_2", "id": `room_${rooms2[yye + 0]}`, "attributes": {}, "listeners": {} });
-
-
-
-            tempDiv.append(tempDiv2);
-            tempDiv.append(tempDiv3);
-
-
-
+            document.getElementById("categoriesCon").append(tempDiv2);
             document.getElementById("custom_rooms").append(tempDiv);
-
-
-
-
-
-
-
             rooms2.splice(yye - 1, 2);
+
 
         }
 
@@ -657,21 +752,39 @@ function addCustomRoom() {
 
 
 
-        let tempDiv = createElement({ "class": "room_con_1", "attributes": {}, "listeners": {} });
-
-        let tempDiv2 = createElement({ "class": "title_a_2", "attributes": { "data-hello": `">"""""` }, "listeners": {}, "innerText": rooms2[i] });
-
-
-        let tempDiv3 = createElement({ "class": "card_con_2", "id": `room_${rooms2[i + 1]}`, "attributes": {}, "listeners": {} });
-
+        let roomID = `room_${rooms2[i + 1]}`;
+        let tempDiv = createElement({
+            "class": `categoriesDataMain${(localStorage.getItem("currentCategory") === roomID) ? " active" : ""}`,
+            "id": roomID
+        });
 
 
-        tempDiv.append(tempDiv2);
-        tempDiv.append(tempDiv3);
+        let tempDiv2 = createCat(roomID, rooms2[i]);
 
-
-
+        document.getElementById("categoriesCon").append(tempDiv2);
         document.getElementById("custom_rooms").append(tempDiv);
+
+    }
+
+
+    if (document.querySelector(".categories.activeCat") === null) {
+        document.getElementById("room_recently").classList.add("active");
+        document.getElementById("recentlyCat").classList.add("activeCat");
+    }
+    try {
+
+
+        document.querySelector(".categories.activeCat").scrollIntoView();
+        let activeCatDOM = document.querySelector(".categories.activeCat");
+        let temp = document.getElementById("catActiveMain");
+        window.requestAnimationFrame(function () {
+            if (temp && activeCatDOM) {
+                temp.style.left = activeCatDOM.offsetLeft;
+                temp.style.height = activeCatDOM.offsetHeight;
+                temp.style.width = activeCatDOM.offsetWidth;
+            }
+        });
+    } catch (err) {
 
     }
 }
@@ -730,9 +843,6 @@ function sendNoti(x) {
 }
 
 
-function search() {
-    window.location = '../search/index.html?query=' + document.getElementById('search_x').value;
-}
 
 
 if (true) {
@@ -920,7 +1030,6 @@ if (true) {
     function get_userinfo_callback(x, y, z) {
 
 
-        document.getElementById("recently").innerHTML = "";
         document.getElementById("room_dis_child").innerHTML = "";
         document.getElementById("room_add_child").innerHTML = "";
         let a = x.data;
@@ -948,14 +1057,13 @@ if (true) {
         updateRoomAdd();
         addCustomRoom();
 
-        document.getElementById("recently").style.display = "block";
         for (var i = 0; i < data.length; i++) {
             let domToAppend;
 
             if (document.getElementById(`room_${data[i][4]}`)) {
                 domToAppend = document.getElementById(`room_${data[i][4]}`);
             } else {
-                domToAppend = document.getElementById('recently');
+                domToAppend = document.getElementById('room_recently');
             }
 
             let tempDiv = createElement({ "class": "s_card", "attributes": {}, "listeners": {} });
@@ -965,10 +1073,17 @@ if (true) {
             let tempDiv2 = createElement({ "class": "s_card_title", "attributes": {}, "listeners": {} });
 
 
-            let tempDiv3 = document.createElement("a");
+            let tempDiv3 = document.createElement("div");
             tempDiv3.className = "s_card_title_main";
             tempDiv3.textContent = fix_title(data[i][0]);
-            tempDiv3.href = "../episode/index.html" + data[i][5];
+            tempDiv3.setAttribute("data-href", data[i][5]);
+            tempDiv3.setAttribute("data-current", data[i][3]);
+
+            tempDiv3.onclick = function () {
+                localStorage.setItem("currentLink", this.getAttribute("data-current"));
+                window.parent.postMessage({ "action": 500, data: "pages/episode/index.html" + this.getAttribute("data-href") }, "*");
+
+            };
 
             let tempDiv4 = createElement({ "class": "card_ep", "attributes": {}, "listeners": {}, "innerText": `Episode ${data[i][1]}` });
             let tempDiv5 = createElement({
@@ -1051,6 +1166,15 @@ if (true) {
 
         }
 
+        let catMainDOM = document.getElementsByClassName("categoriesDataMain");
+        for (var i = 0; i < catMainDOM.length; i++) {
+            catMainDOM[i].append(createElement({
+                "style": {
+                    "width": "100%",
+                    "height": "60px"
+                }
+            }));
+        }
 
         last_order = getCurrentOrder();
 
@@ -1084,8 +1208,11 @@ if (true) {
 
     let verURL = "https://raw.githubusercontent.com/enimax-anime/enimax/main/version.json";
 
-    if (config.chrome) {
+    if (config.firefox) {
+        verURL = "https://raw.githubusercontent.com/enimax-anime/enimax-firefox-extension/main/version.json";
+    } else if (config.chrome) {
         verURL = "https://raw.githubusercontent.com/enimax-anime/enimax-chrome-extension/main/version.json";
+
     }
 
     fetch(verURL).then((x) => x.json())
@@ -1143,4 +1270,4 @@ function changeTheme() {
     }
 }
 
-applyTheme();
+// applyTheme();

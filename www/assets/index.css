@@ -304,12 +304,9 @@ display: inline-block;
   background-position: center;
   background-repeat: no-repeat;
   transition-duration: 0.2s;
-  transform: scale(1);
 }
 
-.card_play:hover {
-  transform: scale(1.1);
-}
+
 
 .card_con {
   overflow-x: scroll;
@@ -574,6 +571,7 @@ display: inline-block;
   display: inline-block;
   margin: 10px;
   user-select: none;
+  white-space: nowrap;
 }
 
 #mainConSearch .s_card{
@@ -621,7 +619,7 @@ display: inline-block;
   /* overflow-y: auto; */
   position: absolute;
   font-family: 'Roboto Slab', serif;
-  font-size: 17px;
+  font-size: 14px;
   width: 100%;
   text-align: left;
   top: 0;
@@ -637,9 +635,10 @@ display: inline-block;
 .s_card_title_main {
   width: 100%;
   white-space: pre-wrap;
-  /* overflow: hidden; */
+  overflow: hidden;
+  max-height: 32px;
+  line-height: 14px;
   text-overflow: ellipsis;
-  /* overflow-y: auto; */
 }
 
 .card_menu_item {
@@ -654,7 +653,6 @@ display: inline-block;
   background-position: center;
   background-repeat: no-repeat;
   transition-duration: 0.2s;
-  transform: scale(1);
 }
 
 .card_menu_icon_delete {
@@ -691,7 +689,6 @@ display: inline-block;
   background-position: center;
   background-repeat: no-repeat;
   transition-duration: 0.2s;
-  transform: scale(1);
 }
 
 .con_main {
@@ -943,7 +940,7 @@ display: inline-block;
   display : flex;
   align-items: center;
   justify-content : center;
-  background-color: rgba(36,36,36,1);
+  background-color: rgba(36,36,36,0);
   box-sizing: border-box;
   padding:15px;
   margin: 15px auto 15px auto;
@@ -953,7 +950,7 @@ display: inline-block;
 .episodesPlay{
   height:70px;
   width:70px;
-  background-color : black;
+  background-color : #363f46;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath d='M7.752 5.439l10.508 6.13a.5.5 0 0 1 0 .863l-10.508 6.13A.5.5 0 0 1 7 18.128V5.871a.5.5 0 0 1 .752-.432z' fill='white' /%3E%3C/svg%3E");
   background-size: 70%;
   background-position:center;
@@ -979,13 +976,25 @@ display: inline-block;
   margin:10px;
   flex-shrink:0; 
   border-radius: 100%;
-  background-color: black;
+  background-color: #363f46;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23FFFFFF'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z'/%3E%3C/svg%3E");
   background-size: 20px 20px;
   background-position:center;
   background-repeat: no-repeat;
 }
 
+.episodesBroken{
+  height:40px;
+  width:40px;
+  margin:10px;
+  flex-shrink:0; 
+  border-radius: 100%;
+  background-color: white;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M0 0h24v24H0zm0 0h24v24H0zm21 19c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2' fill='none'/%3E%3Cpath d='M21 5v6.59l-3-3.01-4 4.01-4-4-4 4-3-3.01V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2zm-3 6.42l3 3.01V19c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2v-6.58l3 2.99 4-4 4 4 4-3.99z'/%3E%3C/svg%3E");
+  background-size: 20px 20px;
+  background-position:center;
+  background-repeat: no-repeat;
+}
 .episodesDownloaded{
   height:40px;
   width:40px;
@@ -1073,27 +1082,4 @@ input:checked+.slider:before {
   border-radius: 50%;
 }
 
-#updateImage{
-  display: none;
-  background-color: var(--theme-color);
-  color: white;
-  border-radius: 10px;
-  font-family: 'Montserrat', sans-serif;
-  border: 0;
-  margin-top: 20px;
-  padding: 15px 20px 15px 20px;
-  font-size: 17px;
-}
-
-#copyLink{
-  display: none;
-  background-color: var(--theme-color);
-  color: white;
-  border-radius: 10px;
-  font-family: 'Montserrat', sans-serif;
-  border: 0;
-  margin-top: 20px;
-  padding: 15px 20px 15px 20px;
-  font-size: 17px;
-}
 

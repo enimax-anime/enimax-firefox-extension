@@ -1,3 +1,7 @@
+body{
+  background-color: #101010;
+  background-image: none !important;
+}
 #sources{
     position: fixed;
     top:10px;

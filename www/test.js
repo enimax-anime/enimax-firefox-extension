@@ -25,6 +25,7 @@ function listDir(path){
 function listDir(path){
 window.resolveLocalFileSystemURL(path,
     function (fileSystem) {
+      console.log(fileSystem);
     var reader = fileSystem.createReader();
     reader.readEntries(
         function (entries) {
@@ -35,7 +36,7 @@ window.resolveLocalFileSystemURL(path,
         }
     );
     }, function (err) {
-    console.log(err);
+    console.log("ff",err);
     }
 );
 }

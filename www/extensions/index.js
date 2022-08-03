@@ -8,7 +8,8 @@ var config = {
     "local": localStorage.getItem("local") === "true",
     "remote": localStorage.getItem("remote"),
     "remoteWOport": localStorage.getItem("remoteWOport"),
-    "chrome" : true,
+    "chrome" : false,
+    "firefox" : false,
 
 };
 
@@ -350,7 +351,7 @@ var wco = {
             var nextPrev = dom.getElementsByClassName("prev-next");
             var data = {};
             for (var npi = 0; npi < nextPrev.length; npi++) {
-                data[nextPrev[npi].children[0].getAttribute("rel")] = nextPrev[npi].children[0].getAttribute("href").replace("https://www.wcoforever.net", "");
+                data[nextPrev[npi].children[0].getAttribute("rel")] = (nextPrev[npi].children[0].getAttribute("href").replace("https://www.wcoforever.net", "")) + "&engine=0";
             }
 
 
@@ -1331,7 +1332,7 @@ const extensionNames = ["WCOforever", "Animixplay", "Fmovies", "Zoro"];
 
 
 
-localStorage.setItem("version", "1.1.1");
+localStorage.setItem("version", "1.1.2");
 if (localStorage.getItem("lastUpdate") === null) {
     localStorage.setItem("lastUpdate", "0");
 

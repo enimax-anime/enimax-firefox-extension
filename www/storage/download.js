@@ -10,8 +10,17 @@ function fix_title(x) {
         return x;
     }
 }
+
+function normalise(x){
+    x = x.replace("?watch=","");
+    x = x.split("&engine=")[0];
+    return x;
+}
+
+
 class DownloadVid {
     constructor(vidData, data, success, error, episodes, pause) {
+        console.log(vidData, data);
         this.success = success;
         this.episodes = episodes;
         this.error = error;
@@ -25,7 +34,7 @@ class DownloadVid {
         this.vidData = vidData;
         this.mapping = [];
         this.preferredSource = localStorage.getItem(`${this.engine}-downloadSource`);
-
+        this.maxBufferLength = 10;
 
         if (vidData.sources.length > 1) {
             let names = "Choose the source (enter the number):\n";
@@ -119,16 +128,29 @@ class DownloadVid {
                 }
             }, false);
 
+            let localQuery = encodeURIComponent(`/${self.name}/${btoa(self.vidData.ogURL)}`);
+
 
             await actionDexie[2]({
                 "body": {
                     "name": vidData.nameWSeason,
                     "nameUm": vidData.name,
                     "ep": vidData.episode,
-                    "cur": `?watch=/${self.name}`
+                    "cur": `?watch=${localQuery}`
                 }
 
             }, false);
+
+
+
+
+            console.log(await actionDexie[14]({
+                "body": {
+                    "name": vidData.name,                    
+                    "url": `?watch=/${self.name}`,
+                }
+
+            }, false));
 
 
 
@@ -483,7 +505,7 @@ class DownloadVid {
             self.updateNoti(`Storing downloaded data - Episode ${self.vidData.episode} - ${fix_title(self.name)}`, self, 1);
             if (self.check == 0) {
                 self.check = 1;
-                var data = new Blob(self.buffers.splice(0, Math.min(self.buffers.length, 100)), { "type": "video/mp4" });
+                var data = new Blob(self.buffers.splice(0, Math.min(self.buffers.length, self.maxBufferLength)), { "type": "video/mp4" });
 
                 self.fileEntry.createWriter(function (fileWriter) {
 
@@ -491,6 +513,8 @@ class DownloadVid {
                         self.check = 0;
                         if (self.buffers.length != 0) {
                             self.saveToLocal(1, self);
+                        }else{
+                            self.done(self);
                         }
                     };
 
@@ -508,12 +532,12 @@ class DownloadVid {
             } else {
                 setTimeout(function () {
                     self.saveToLocal(1, self);
-                }, 100);
+                }, 1000);
             }
         } else {
-            if (self.buffers.length > 100 && self.check == 0) {
+            if (self.buffers.length > self.maxBufferLength && self.check == 0) {
                 self.check = 1;
-                var data = new Blob(self.buffers.splice(0, 100), { "type": "video/mp4" });
+                var data = new Blob(self.buffers.splice(0, self.maxBufferLength), { "type": "video/mp4" });
                 self.fileEntry.createWriter(function (fileWriter) {
 
                     fileWriter.onwriteend = function (e) {
@@ -572,7 +596,6 @@ class DownloadVid {
                                     self.updateNoti(`Episode ${self.vidData.episode} - ${fix_title(self.name)}`, self);
                                     self.saveToLocal(1, self);
                                     self.saved = true;
-                                    self.done(self);
                                     return total;
                                 }
 
@@ -584,7 +607,7 @@ class DownloadVid {
                                 const value = result.value;
                                 self.downloaded += value.length;
                                 self.buffers.push(value.buffer);
-                                if (self.buffers.length > 100) {
+                                if (self.buffers.length > self.maxBufferLength) {
                                     self.updateNoti(`Episode ${self.vidData.episode} - ${fix_title(self.name)}`, self);
 
 

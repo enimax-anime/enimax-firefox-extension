@@ -1175,7 +1175,11 @@ if(true){
 
                 // await mysql_query("DELETE FROM video where ep=0 and name=? and username=?", [name, username]);
                 if (db == downloadedDB) {
-                    await window.parent.removeDirectory(`${name}`);
+                    try{
+                        await window.parent.removeDirectory(`${name}`);
+                    }catch(err){
+                        alert("Could not delete the files. You have to manually delete it by going to the show's page.");
+                    }
                 }
                 await db.vid.filter((x) => (
                     x.ep == 0 &&

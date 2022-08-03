@@ -20,6 +20,9 @@
 
 
 <style>
+    body{
+        background-color: #101010;
+    }
     iframe {
         padding: 0;
         margin: 0;
@@ -27,6 +30,7 @@
         position: absolute;
         top: 0;
         left: 0;
+        transition-duration: 200ms;
         height: 100%;
         width: 100%;
         z-index: 0;
@@ -37,7 +41,9 @@
         margin: 0;
         border: 0;
         position: absolute;
-        top: 0;
+        transition-duration: 200ms;
+
+        bottom: 0;
         left: 0;
         display: none;
         height: 100%;
@@ -45,7 +51,18 @@
         z-index: 1;
 
     }
-
+    #spotlight{
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-color: black;
+        pointer-events: none;
+        opacity: 0;
+        z-index: 2;
+        transition-duration: 200ms;
+    }
     .pop{
 
         bottom: 0 !important;
@@ -65,7 +82,6 @@
 
     <iframe src="" id="frame"></iframe>
     <iframe src="fallback.html" id="player" ></iframe>
-
 
 
 

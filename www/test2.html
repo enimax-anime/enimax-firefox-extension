@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <script src="./assets/index.js"></script>
+        <style>
+            body{
+                margin: 0;
+                background-color: #161616;
+            }
+            .categories{
+                height: 30px;
+                line-height: 30px;
+                font-size: 15px;
+                margin: 5px;
+                display: inline-block;
+                border-radius: 30px;
+                background-color: transparent;
+                border: 1px solid white;
+                color: white;
+                padding: 10px 20px 10px 20px;
+                font-family: 'Montserrat', sans-serif;
+
+
+            }
+
+            #categoriesCon{
+                height: 60px;
+                width: 100%;
+                overflow-x: auto;
+                overflow-y: hidden;
+                white-space: nowrap;
+            }
+
+            #categoriesData{
+                height: calc(100% - 60px);
+                width: 100%;
+            }
+
+            .categoriesDataMain{
+                height: 100%;
+                width: 100%;
+                overflow-y: auto;
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="categoriesCon"></div>
+        <div id="categoriesData"></div>
+
+
+        <script>
+            let categories = ["Recently watched", "To watch", "Airing", "Renewed"];
+            let categoriesID = [0, 31, 42, 43];
+            let catCon = document.getElementById("categoriesCon");
+            let catData = document.getElementById("categoriesData");
+
+            function activeCat(x){
+                let thisCat = document.getElementById(`catData${x}`);
+                let thisCatClass = document.getElementsByClassName(`categoriesDataMain`);
+
+                if(thisCat){
+                    for(let i = 0; i < thisCatClass.length; i++){
+                        if(thisCat == thisCatClass[i]){
+                            thisCatClass[i].style.display = "block";
+                        }else{
+                            thisCatClass[i].style.display = "none";
+                        }
+                    }
+                }
+            }
+            for(let i = 0; i < categories.length; i++){ 
+                let temp1 = createElement({
+                    "innerText" : categories[i],
+                    "class" : "categories"
+                });
+
+                temp1.setAttribute("data-i",categoriesID[i]);
+                
+                temp1.onclick = function(){
+                    activeCat(this.getAttribute("data-i"));
+                };
+
+
+                let temp2 = createElement({
+                    "class" : "categoriesDataMain",
+                    "id" : `catData${categoriesID[i]}`
+                });
+                
+                catCon.append(temp1);
+                catData.append(temp2);
+            }
+        </script>
+    </body>
+</html>

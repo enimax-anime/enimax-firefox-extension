@@ -1980,7 +1980,7 @@ document.querySelector("#repForward").onclick = function () {
 
 
 
-
+let socketCalledIni = false;
 
 
 if (location.search.includes("engine=3")) {
@@ -2017,14 +2017,16 @@ if (location.search.includes("engine=3")) {
 	let socket = io("https://ws1.rapid-cloud.ru", { transports: ["websocket"] });
 	socket.on("connect", () => {
 		sid = socket.id;
-		socket.off("connect");
+		if(socketCalledIni === false){
+			if (config.local || downloaded) {
+				ini_main();
+			} else {
+				window.parent.postMessage({ "action": 20, data: "" }, "*");
 
-		if (config.local || downloaded) {
-			ini_main();
-		} else {
-			window.parent.postMessage({ "action": 20, data: "" }, "*");
-
+			}
 		}
+		socketCalledIni = true;
+
 
 	});
 } else {

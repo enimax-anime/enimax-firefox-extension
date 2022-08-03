@@ -1,19 +1,100 @@
-<video id="video" controls></video>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
-<script src="cordova.js"></script>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800;900&display=swap"
+    rel="stylesheet">
+<style>
+    :root {
+        --image-min-height: 400px;
+    }
 
-<script>
+    body {
+        margin: 0;
+    }
+
+    .imageback {
+        position: relative;
+        width: 100%;
+        min-height: var(--image-min-height);
+        overflow: hidden;
+        border-radius: 0 0 30px 30px;
+    }
+
+    .imageMain {
+        background-image: url("https://cdn.animationexplore.com/catimg/28115.jpg");
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-size: cover;
+        background-position: center;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+
+    }
+
+    .imageSpotlight {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .imageTitle {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 30px;
+        color: white;
+        margin: 10px 20px 10px 20px;
+        position: absolute;
+        line-height: 40px;
+        bottom: 0;
+    }
+
+    .infoCon {
+        position: relative;
+        z-index: 2;
+        top: 0;
+        left: 0;
+        width: 100%;
+        min-height: var(--image-min-height);
 
 
-    var hls = new Hls();
-    hls.loadSource("/extension2/odd-taxi-/1/master.m3u8");
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, function () {
-        video.play();
-        hls.on(Hls.Events.BUFFER_APPENDING, function (event, data) {
-            console.log("apending");
-            dataStream[data.type].push(data.data);
-        });
-    });
+    }
 
-</script>
+    .imageDesc {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 17px;
+        color: white;
+        margin: 20px auto 20px auto;
+        padding: 40px;
+        padding-bottom: 70px;
+        min-height: var(--image-min-height);
+        display: flex;
+        align-items: center;
+
+    }
+</style>
+
+
+<body>
+    <div class="imageBack">
+        <div class="imageMain"></div>
+        <div class="imageSpotlight"></div>
+        <div class="infoCon">
+            <div class="imageDesc">Plot Summary: Strange suicides have been taking place in New York. One day, four
+                girls from the same high school wake up in the morning feeling tired and dizzy and not being able to
+                remember anything about the previous night. In school, they find out that one of their classmates has
+                committed suicide. School is canceled for the rest of the day, but instead of going home, the girls are
+                drawn to a park by butterflies only they can see. Suddenly a man and a woman approach the girls, telling
+                them that they all died the previous night. </div>
+
+            <div class="imageTitle">Red Garden</div>
+
+
+        </div>
+    </div>
+</body>
+
+</html>
