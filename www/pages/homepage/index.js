@@ -12,9 +12,70 @@ function resetOfflineQual() {
     }
 }
 
+function readImage(file) {
+    return (new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+        reader.addEventListener('load', (event) => {
+            resolve(event.target.result);
+        });
+
+        reader.addEventListener('error', (event) => {
+            reject("err");
+        });
+        reader.readAsArrayBuffer(file);
+    }));
+}
+
+
+
+function importDataSQL() {
+
+}
+
+function exportDataSQL() {
+    var options = {
+        files: [window.parent.cordova.file.applicationStorageDirectory + "databases/data4.db"],
+    };
+
+    window.parent.plugins.socialsharing.shareWithOptions(options, (x) => console.log(x), (x) => {
+        alert("Something went wrong");
+    });
+
+}
+
 document.getElementById("resetQuality").onclick = function () {
     resetOfflineQual();
 }
+
+document.getElementById("importFile").onchange = async function (event) {
+
+    try{
+        let confirmation = prompt("Are you sure you want to import this file? Your current data will be replaced by the imported file. Type \"YES\" to continue.");
+
+        if(confirmation == "YES"){
+            const fileList = event.target.files;
+            let result = await readImage(fileList[0]);
+            window.parent.saveAsImport(result);
+        }else{
+            alert("Aborting");
+        }
+        
+
+    }catch(err){
+        alert("Error reading the file.");
+    }
+    
+    
+    
+}
+document.getElementById("exportData").onclick = function () {
+    exportDataSQL();
+}
+
+// document.getElementById("exportData").onclick = function () {
+//     importDataSQL();
+// }
 
 document.getElementById("accessability").onclick = function () {
     document.getElementById("accessabilityCon").style.display = "flex";
@@ -187,6 +248,11 @@ document.getElementById("queueOpen").onclick = function () {
 
 if (!config.chrome) {
     document.getElementById("offlineCon").style.display = "block";
+
+    if(config.local){
+        document.getElementById("exportData").style.display = "block";
+        document.getElementById("importData").style.display = "block";
+    }
 }
 
 if (localStorage.getItem("offline") === 'true') {
@@ -691,19 +757,19 @@ function addCustomRoom() {
                                 temp.style.width = activeCatDOM.offsetWidth;
                             }
 
-                            setTimeout(function(){
+                            setTimeout(function () {
                                 let tempCatData = document.getElementsByClassName("categoriesDataMain");
                                 for (let i = 0; i < tempCatData.length; i++) {
                                     if (tempCatData[i].id == thisDataId) {
                                         tempCatData[i].classList.add("active");
-    
+
                                     } else {
                                         tempCatData[i].classList.remove("active");
-    
+
                                     }
                                 }
                             }, 200);
-                            
+
                         });
                     });
 

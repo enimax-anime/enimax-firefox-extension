@@ -119,6 +119,10 @@ async function dexieToSQLite() {
 }
 
 let db;
+
+function getDB(){
+    return db;
+}
 let actions;
 async function SQLInit() {
     db = window.parent.sqlitePlugin.openDatabase({

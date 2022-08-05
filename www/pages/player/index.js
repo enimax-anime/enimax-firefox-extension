@@ -2,11 +2,29 @@ var username = "hi";
 var lastSrc = "";
 var token;
 var hls;
-
+let doubleTapTime = isNaN(parseInt(localStorage.getItem("doubleTapTime"))) ? 5 : parseInt(localStorage.getItem("doubleTapTime"));
+let skipButTime = isNaN(parseInt(localStorage.getItem("skipButTime"))) ? 30 : parseInt(localStorage.getItem("skipButTime"));
 var CustomXMLHttpRequest = XMLHttpRequest;
 
 
+document.getElementById("doubleTime").oninput = function(){
+	if(isNaN(parseInt(document.getElementById("doubleTime").value))){
+		document.getElementById("doubleTime").value = "";
+	}else{
+		localStorage.setItem("doubleTapTime", document.getElementById("doubleTime").value);
+		doubleTapTime =  isNaN(parseInt(localStorage.getItem("doubleTapTime"))) ? 5 : parseInt(localStorage.getItem("doubleTapTime"));
+	}
+}
 
+
+document.getElementById("skipTime").oninput = function(){
+	if(isNaN(parseInt(document.getElementById("skipTime").value))){
+		document.getElementById("skipTime").value = "";
+	}else{
+		localStorage.setItem("skipButTime", document.getElementById("skipTime").value);
+		skipButTime =  isNaN(parseInt(localStorage.getItem("skipButTime"))) ? 5 : parseInt(localStorage.getItem("skipButTime"));
+	}
+}
 
 var sid;
 
@@ -192,6 +210,8 @@ window.onmessage = function (x) {
 		next_ep_func(1);
 	} else if (x.data.action == "previous") {
 		next_ep_func(-1);
+	}else if (x.data.action == "elapsed") {
+		a.vid.currentTime = x.data.elapsed;
 	} else if (parseInt(x.data.action) == 200) {
 		token = x.data.data;
 		if (config.chrome == false && token.indexOf("connect.sid") == -1) {
@@ -372,6 +392,7 @@ class vid {
 
 
 		this.vid.addEventListener("loadedmetadata", function () {
+			window.parent.postMessage({ "action": 12, nameShow: data_main.name, episode: data_main.episode, prev: true, next: true, "duration" : x.vid.duration, "elapsed" : x.vid.currentTime}, "*");
 			x.total.innerText = x.timeToString(x.vid.duration);
 
 			let whichFit = parseInt(localStorage.getItem("fillMode")) || 0;
@@ -562,6 +583,9 @@ class vid {
 
 
 		setInterval(function () {
+
+			window.parent.postMessage({ "action": 301,  "elapsed" : x.vid.currentTime, "isPlaying":!x.vid.paused}, "*");
+
 			if (((new Date()).getTime() - x.lastTime) > 3000 && x.open == 1) {
 				x.close_controls();
 			}
@@ -698,12 +722,12 @@ class vid {
 		} else if (this.doubleMode == 1 && typeof this.doubleClickCoords == 'object' && this.doubleClickCoords.length == 2 && Math.abs(this.doubleClickCoords[0] - coor[0]) < 50 && Math.abs(this.doubleClickCoords[1] - coor[1]) < 50) {
 
 			if (coor[0] > window.innerWidth / 2) {
-				this.vid.currentTime += 5;
+				this.vid.currentTime += doubleTapTime;
 				a.updateTime(a);
 
 
 			} else {
-				this.vid.currentTime -= 5;
+				this.vid.currentTime -= doubleTapTime;
 				a.updateTime(a);
 
 
@@ -1887,7 +1911,6 @@ async function get_ep(x = 0) {
 
 
 
-		window.parent.postMessage({ "action": 12, nameShow: data_main.name, episode: data_main.episode, prev: true, next: true }, "*");
 
 
 		get_ep_check = 0;
@@ -1955,7 +1978,7 @@ document.querySelector("#rewatch").addEventListener("change", function () {
 
 
 document.querySelector("#repBack").onclick = function () {
-	a.vid.currentTime -= 30;
+	a.vid.currentTime -= skipButTime;
 	a.updateTime(a);
 
 };
@@ -1972,7 +1995,7 @@ document.querySelector("#closeSetting").onclick = function () {
 
 
 document.querySelector("#repForward").onclick = function () {
-	a.vid.currentTime += 30;
+	a.vid.currentTime += skipButTime;
 	a.updateTime(a);
 
 };

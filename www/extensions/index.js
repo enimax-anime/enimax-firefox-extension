@@ -10,6 +10,7 @@ var config = {
     "remoteWOport": localStorage.getItem("remoteWOport"),
     "chrome" : true,
     "firefox" : true,
+    "beta" : false,
 
 };
 
@@ -906,12 +907,15 @@ var fmovies = {
                             }
                         };
 
+                        let host = (new URL(urlS)).origin;
 
                         var link = urlS.split("/");
                         link = link[link.length - 1];
                         link = link.split("?")[0];
 
-                        var second = await MakeCusReqFmovies(`https://streamrapid.ru/ajax/embed-4/getSources?id=${link}&_token=3&_number=${6}`, option23);
+                        console.log(link, host, `${host}/ajax/embed-4/getSources?id=${link}&_token=3&_number=${6}`);
+                        var second = await MakeCusReqFmovies(`${host}/ajax/embed-4/getSources?id=${link}&_token=3&_number=${6}`, option23);
+
                         let jsonq = JSON.parse(second);
                         resolve(jsonq);
 
@@ -1332,7 +1336,7 @@ const extensionNames = ["WCOforever", "Animixplay", "Fmovies", "Zoro"];
 
 
 
-localStorage.setItem("version", "1.1.2");
+localStorage.setItem("version", "1.1.3");
 if (localStorage.getItem("lastUpdate") === null) {
     localStorage.setItem("lastUpdate", "0");
 

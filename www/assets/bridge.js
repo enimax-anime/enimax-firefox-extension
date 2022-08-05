@@ -1,18 +1,79 @@
 var socket;
 let frameHistory = [];
 var token;
+let seekCheck = true;
 
-function setURL(url){
+function setURL(url) {
     document.getElementById("frame").style.opacity = "0";
-    setTimeout(function(){
+    setTimeout(function () {
         document.getElementById("frame").contentWindow.location = url;
-        setTimeout(function(){
+        setTimeout(function () {
             document.getElementById("frame").style.opacity = "1";
-            
 
-            
-        },200);
-    },200);
+
+
+        }, 200);
+    }, 200);
+}
+
+
+function saveAsImport(arrayInt) {
+    try {
+        let blob = new Blob([arrayInt]);
+        db.close(async function () {
+            window.resolveLocalFileSystemURL(`${window.parent.cordova.file.applicationStorageDirectory}${"databases"}`, function (fileSystem) {
+
+                fileSystem.getFile("data4.db", { create: true, exclusive: false }, function (file) {
+
+                    file.createWriter(function (fileWriter) {
+
+                        fileWriter.onwriteend = function (e) {
+                            alert("Done!");
+                            window.location.reload();
+
+                        };
+
+                        fileWriter.onerror = function (e) {
+                            alert("Couldn't write to the file - 2.");
+                            window.location.reload();
+
+                        };
+
+
+                        fileWriter.write(blob);
+
+                    }, (err) => {
+                        alert("Couldn't write to the file.");
+                        window.location.reload();
+
+                    });
+
+
+                }, function (x) {
+                    alert("Error opening the database file.");
+
+                    window.location.reload();
+
+
+
+                });
+
+            }, function (error) {
+                alert("Error opening the database folder.");
+                window.location.reload();
+
+            });
+        }, function (error) {
+            alert("Error closing the database.");
+            window.location.reload();
+
+        });
+    } catch (err) {
+        alert("Error getting the database variable.");
+        window.location.reload();
+
+    }
+
 }
 
 function listDir(path) {
@@ -181,19 +242,19 @@ class downloadQueue {
         }
     }
 
-    deleteFilesHead(self){
+    deleteFilesHead(self) {
 
-        try{
+        try {
             let curElem = self.queue[0];
             let temp3 = curElem.data.replace("?watch=", "");
             temp3 = temp3.split("&engine=");
-            window.parent.removeDirectory(`/${curElem.anime.mainName}/${btoa(temp3[0])}/`).then(function(){
-                
-            }).catch(function(){
+            window.parent.removeDirectory(`/${curElem.anime.mainName}/${btoa(temp3[0])}/`).then(function () {
+
+            }).catch(function () {
                 alert("Could not delete the file. You have to delete it manually. Error 1000");
-                
+
             });
-        }catch(err){
+        } catch (err) {
             alert("Could not delete the file. You have to delete it manually.");
         }
     }
@@ -653,7 +714,7 @@ function exec_action(x, reqSource) {
     } else if (x.action == 500) {
 
         setURL(x.data);
-        
+
 
     } else if (x.action == 22) {
         window.location = "reset.html";
@@ -665,6 +726,11 @@ function exec_action(x, reqSource) {
 
 
 
+    } else if (x.action == 301 && config.beta && seekCheck) {
+        MusicControls.updateElapsed({
+            elapsed: x.elapsed * 1000,
+            isPlaying: x.isPlaying
+        });
     } else if (x.action == 12) {
         if (!config.chrome) {
 
@@ -676,13 +742,14 @@ function exec_action(x, reqSource) {
                 showName[i] = temp;
 
             }
+            seekCheck = true;
+
 
             x.nameShow = showName.join(" ");
-
-            MusicControls.create({
+            const controlOption = {
                 track: x.nameShow,
                 artist: "Episode " + x.episode,
-                cover: 'anime.png',
+                cover: 'assets/images/anime.png',
 
                 isPlaying: true,							// optional, default : true
                 dismissable: true,							// optional, default : false
@@ -700,7 +767,14 @@ function exec_action(x, reqSource) {
                 nextIcon: 'media_next',
                 closeIcon: 'media_close',
                 notificationIcon: 'notification'
-            }, function () { }, function () { });
+            };
+
+            if (config.beta) {
+                controlOption.hasScrubbing = true;
+                controlOption.duration = x.duration ? x.duration * 1000 : 0;
+                controlOption.elapsed = x.elapsed ? x.elapsed : 0;
+            }
+            MusicControls.create(controlOption, function () { }, function () { });
 
 
 
@@ -725,7 +799,20 @@ function exec_action(x, reqSource) {
                         document.getElementById("player").contentWindow.postMessage({ "action": "play" }, "*");
 
                         break;
+                    case 'music-controls-media-button-play':
+                        document.getElementById("player").contentWindow.postMessage({ "action": "play" }, "*");
+                        break;
+                    case 'music-controls-media-button-pause':
+                        document.getElementById("player").contentWindow.postMessage({ "action": "pause" }, "*");
+                        break;
+                    case 'music-controls-media-button-previous':
+                        document.getElementById("player").contentWindow.postMessage({ "action": "previous" }, "*");
+                        break;
+                    case 'music-controls-media-button-next':
+                        document.getElementById("player").contentWindow.postMessage({ "action": "next" }, "*");
+                        break;
                     case 'music-controls-destroy':
+                        seekCheck = false;
 
                         break;
                     case 'music-controls-toggle-play-pause':
@@ -744,6 +831,9 @@ function exec_action(x, reqSource) {
                     case 'music-controls-headset-plugged':
 
                         break;
+                    case 'music-controls-seek-to':
+                        document.getElementById("player").contentWindow.postMessage({ "action": "elapsed", "elapsed": (JSON.parse(action).position) / 1000 }, "*");
+                        break;
                     default:
                         break;
                 }
@@ -761,23 +851,23 @@ function exec_action(x, reqSource) {
 
             document.getElementById("player").contentWindow.location = ("pages/player/index.html" + x.data);
 
-        } else if(config.chrome){
+        } else if (config.chrome) {
             document.getElementById("player").contentWindow.location.replace("pages/player/index.html" + x.data);
 
         }
 
 
-        if(!config.chrome){
+        if (!config.chrome) {
             let checkLock = 0;
 
-            setTimeout(function(){
-                if(checkLock == 0){
+            setTimeout(function () {
+                if (checkLock == 0) {
                     document.getElementById("player").contentWindow.location.replace("pages/player/index.html" + x.data);
                 }
             }, 100);
             screen.orientation.lock("landscape").then(function () {
             }).catch(function (error) {
-            }).finally(function(){
+            }).finally(function () {
                 checkLock = 1;
                 document.getElementById("player").contentWindow.location.replace("pages/player/index.html" + x.data);
 

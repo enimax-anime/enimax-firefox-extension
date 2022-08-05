@@ -627,3 +627,17 @@ select{
     border-radius: 10px;
     transform: translate(-50%, 0);
 }
+
+.textBox {
+    display: inline-block;
+    border-radius: 10px;
+    height: 20px;
+    padding: 10px;
+    margin: 10px;
+    border: 0;
+    width: 100px;
+}
+
+#doubleTime{
+    margin-right: 10px;
+}
