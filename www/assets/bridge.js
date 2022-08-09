@@ -162,6 +162,12 @@ class downloadQueue {
         setInterval(function () {
             self.emitPercent(self);
         }, 1000);
+
+        setInterval(function(){
+            if(self.pause && cordova.plugins.backgroundMode.isActive()){
+                cordova.plugins.backgroundMode.disable();
+            }
+        },5000);
     }
 
     emitPercent(self) {
@@ -407,7 +413,10 @@ class downloadQueue {
 
 
         if (self.queue.length == 0) {
+            cordova.plugins.backgroundMode.disable();
             return;
+        }else{
+            cordova.plugins.backgroundMode.enable();
         }
         let currentEngine;
         let engineNum;
@@ -436,6 +445,7 @@ class downloadQueue {
                 if (self.pause) {
                     return;
                 }
+                console.log(temp);
                 temp.ogURL = temp3[0];
                 temp.engine = engineNum;
                 curQueueElem.downloadInstance = new DownloadVid(temp, curQueueElem.anime, () => { self.done(self) }, () => { self.error(self) }, episodes.episodes, self.pause);
@@ -970,12 +980,6 @@ async function onDeviceReady() {
     function nope() {
 
     }
-    window.BackgroundService.start(
-        function (fn) { nope(), fn && fn() },
-        function () { console.log('err') }
-    )
-
-    cordova.plugins.backgroundMode.enable();
 
 }
 

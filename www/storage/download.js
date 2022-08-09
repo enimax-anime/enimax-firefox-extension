@@ -161,7 +161,7 @@ class DownloadVid {
 
 
         if (this.engine == 3) {
-            let socket = io("https://ws1.rapid-cloud.ru", { transports: ["websocket"] });
+            let socket = io(extensionList[3].config.socketURL, { transports: ["websocket"] });
             socket.on("connect", () => {
                 self.sid = socket.id;
                 socket.off("connect");
@@ -401,8 +401,8 @@ class DownloadVid {
             cordova.plugin.http.sendRequest(uri, {
                 "method": "GET",
                 "headers": {
-                    "origin": "https://rapid-cloud.ru",
-                    "referer": "https://rapid-cloud.ru/",
+                    "origin": extensionList[3].config.origin,
+                    "referer": extensionList[3].config.referer,
                     "sid": self.sid
                 },
                 "responseType": "blob"
@@ -500,7 +500,9 @@ class DownloadVid {
 
 
     saveToLocal(x = 0, self) {
-
+        if(self.pause){
+            return;
+        }
         if (x == 1) {
             self.updateNoti(`Storing downloaded data - Episode ${self.vidData.episode} - ${fix_title(self.name)}`, self, 1);
             if (self.check == 0) {

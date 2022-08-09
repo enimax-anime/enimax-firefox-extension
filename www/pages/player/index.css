@@ -552,7 +552,17 @@ input:checked+.slider:before {
     transform: translateX(26px);
 }
 
-
+#skipIntroDOM{
+    display: none;
+    z-index: 99;
+    position: absolute;
+    right: 30px;
+    border-radius: 10px;
+    bottom: 70px;
+    padding: 10px;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+}
 .slider.round {
     border-radius: 34px;
 }

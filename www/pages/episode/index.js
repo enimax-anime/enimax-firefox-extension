@@ -257,24 +257,6 @@ function ini() {
                             check = true;
 
                             tempDiv4.className ='episodesBroken';
-                            tempDiv4.onclick = function () {
-                                window.parent.removeDirectory(`/${data.mainName}/${btoa(normalise(trr))}/`).then(function(){
-                                    if(downloaded){
-                                        tempDiv.remove();
-                                    }else{
-                                        tempDiv4.className ='episodesDownload';
-                                        tempDiv4.onclick = function () {
-                                        tempDiv4.className ='episodesLoading';
-    
-                                            window.parent.postMessage({ "action": 403, "data": tempDiv4.getAttribute("data-url"), "anime": data, "mainUrl" : main_url, "title" :  tempDiv4.getAttribute("data-title")}, "*");
-    
-                        
-                                        };
-                                    }
-                                }).catch(function(err){
-                                    alert("Error deleting the files.");
-                                });
-                            }
                         }
 
                     }

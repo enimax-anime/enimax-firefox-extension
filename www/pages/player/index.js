@@ -4,6 +4,8 @@ var token;
 var hls;
 let doubleTapTime = isNaN(parseInt(localStorage.getItem("doubleTapTime"))) ? 5 : parseInt(localStorage.getItem("doubleTapTime"));
 let skipButTime = isNaN(parseInt(localStorage.getItem("skipButTime"))) ? 30 : parseInt(localStorage.getItem("skipButTime"));
+let data_main = {};
+let skipIntroInfo = {};
 var CustomXMLHttpRequest = XMLHttpRequest;
 
 
@@ -51,8 +53,8 @@ class XMLHttpRequest2 {
 
 		this.delegate = null;
 		this.requestHeaders = {
-			"origin": "https://rapid-cloud.ru",
-			"referer": "https://rapid-cloud.ru/",
+			"origin": extensionList[3].config.origin,
+			"referer": extensionList[3].config.referer,
 			"sid": sid,
 		};
 		this.responseHeaders = {};
@@ -584,7 +586,30 @@ class vid {
 
 		setInterval(function () {
 
-			window.parent.postMessage({ "action": 301,  "elapsed" : x.vid.currentTime, "isPlaying":!x.vid.paused}, "*");
+			if(config.beta){
+				window.parent.postMessage({ "action": 301,  "elapsed" : x.vid.currentTime, "isPlaying":!x.vid.paused}, "*");
+			}
+
+			try{
+				if(skipIntroInfo && x.vid.currentTime > skipIntroInfo.start && x.vid.currentTime < skipIntroInfo.end){
+					if(localStorage.getItem("autoIntro") === "true"){
+						x.vid.currentTime = skipIntroInfo.end;
+					}
+
+					if(localStorage.getItem("showIntro") !== "true"){
+						document.getElementById("skipIntroDOM").style.display = "block";
+					}else{
+						document.getElementById("skipIntroDOM").style.display = "none";
+
+					}
+
+				}else{
+					document.getElementById("skipIntroDOM").style.display = "none";
+
+				}
+			}catch(err){
+
+			}
 
 			if (((new Date()).getTime() - x.lastTime) > 3000 && x.open == 1) {
 				x.close_controls();
@@ -1277,6 +1302,7 @@ function get_ep_ini() {
 		let rootDir = decodeURIComponent(location.search.replace("?watch=", "").split("&")[0]);
 		window.parent.makeLocalRequest("GET", `${rootDir}/viddata.json`).then(function (viddata) {
 			viddata = JSON.parse(viddata).data;
+			console.log(viddata);
 
 			data_main = viddata;
 			if ("next" in data_main) {
@@ -1313,11 +1339,21 @@ function get_ep_ini() {
 				}
 			}
 
+			let skipIntro;
+			if("skipIntro" in viddata.sources[0]){
+				skipIntro = viddata.sources[0].skipIntro;
+			}
 			data_main.sources = [{
 				"name": viddata.sources[0].name,
 				"type": viddata.sources[0].type,
 				"url": viddata.sources[0].type == 'hls' ? `${rootDir}/master.m3u8` : `${window.parent.cordova.file.externalDataDirectory}/${rootDir}/master.m3u8`,
 			}];
+
+			if(skipIntro){
+				data_main.sources[0].skipIntro = skipIntro;
+			}
+
+			
 
 			engine = data_main.engine;
 			get_ep();
@@ -1493,6 +1529,8 @@ async function update(x) {
 			errorCount = 0;
 			alert("Time could not be synced with the server.");
 
+		}else if(errorCount == 5){
+			lastUpdate = a.vid.currentTime;
 		}
 
 	});
@@ -1632,7 +1670,12 @@ function chooseQual(x, type, th) {
 	let defURL;
 	if (x !== null) {
 		skipTo = a.vid.currentTime;
-
+		if(th.getAttribute("data-intro") === "true"){
+			skipIntroInfo.start = parseInt(th.getAttribute("data-start"));
+			skipIntroInfo.end = parseInt(th.getAttribute("data-end"));
+		}else{
+			skipIntroInfo = {};	
+		}
 		let qCon = document.getElementById("quality_con").children;
 		for (var i = 0; i < qCon.length; i++) {
 			if (qCon[i] == th) {
@@ -1652,6 +1695,13 @@ function chooseQual(x, type, th) {
 		for (let i = 0; i < qCon.length; i++) {
 			if (sName == qCon[i].innerText) {
 				defURL = data_main.sources[i].url;
+				if(qCon[i].getAttribute("data-intro") === "true"){
+					skipIntroInfo.start = parseInt(qCon[i].getAttribute("data-start"));
+					skipIntroInfo.end = parseInt(qCon[i].getAttribute("data-end"));
+				}else{
+					skipIntroInfo = {};	
+				}
+
 
 				for (let j = 0; j < qCon.length; j++) {
 					if (j == i) {
@@ -1663,6 +1713,7 @@ function chooseQual(x, type, th) {
 					}
 				}
 
+				break;
 			}
 		}
 
@@ -1837,16 +1888,26 @@ async function get_ep(x = 0) {
 			}
 
 			let temp1;
+			let curAttributes = {
+				"data-url": data_main.sources[i].url,
+				"data-type": data_main.sources[i].type,
+				"data-name": data_main.sources[i].name,
+			};
 
+			if("skipIntro" in data_main.sources[i] && "start" in data_main.sources[i].skipIntro && "end" in data_main.sources[i].skipIntro){
+				curAttributes["data-intro"] = "true";
+				curAttributes["data-start"] = data_main.sources[i].skipIntro.start;
+				curAttributes["data-end"] = data_main.sources[i].skipIntro.end;
+				if(i == 0){
+					skipIntroInfo.start = data_main.sources[i].skipIntro.start;
+					skipIntroInfo.end = data_main.sources[i].skipIntro.end;					
+				}
+			}
 			// if(data_main.sources[i].type != "hls"){			
 			temp1 = createElement({
 				"class": "qual",
 				"innerText": data_main.sources[i].name,
-				"attributes": {
-					"data-url": data_main.sources[i].url,
-					"data-type": data_main.sources[i].type,
-					"data-name": data_main.sources[i].name,
-				},
+				"attributes": curAttributes,
 				"listeners": {
 					"click": function () {
 						localStorage.setItem(`${engine}-sourceName`, this.getAttribute("data-name"));
@@ -1958,6 +2019,19 @@ if (localStorage.getItem("rewatch")) {
 	localStorage.setItem("rewatch", "false");
 }
 
+
+document.querySelector("#showIntroSlider").checked = localStorage.getItem("showIntro") === "true";
+document.querySelector("#autoIntroSlider").checked = localStorage.getItem("autoIntro") === "true";
+
+document.querySelector("#showIntroSlider").onclick = function(){
+	localStorage.setItem("showIntro", document.querySelector("#showIntroSlider").checked === true);
+}
+
+document.querySelector("#autoIntroSlider").onclick = function(){
+	localStorage.setItem("autoIntro", document.querySelector("#autoIntroSlider").checked === true);
+}
+
+
 document.querySelector("#autoplay").addEventListener("change", function () {
 	if (document.querySelector("#autoplay").checked) {
 		localStorage.setItem("autoplay", "true");
@@ -2014,12 +2088,12 @@ if (location.search.includes("engine=3")) {
 			function (details) {
 				details.requestHeaders.push({
 					"name": "origin",
-					"value": "https://rapid-cloud.ru"
+					"value": extensionList[3].config.origin
 				});
 
 				details.requestHeaders.push({
 					"name": "referer",
-					"value": "https://rapid-cloud.ru/"
+					"value": extensionList[3].config.referer
 				});
 
 				details.requestHeaders.push({
@@ -2037,7 +2111,7 @@ if (location.search.includes("engine=3")) {
 			['blocking', 'requestHeaders']
 		);
 	}
-	let socket = io("https://ws1.rapid-cloud.ru", { transports: ["websocket"] });
+	let socket = io(extensionList[3].config.socketURL, { transports: ["websocket"] });
 	socket.on("connect", () => {
 		sid = socket.id;
 		if(socketCalledIni === false){
@@ -2136,3 +2210,9 @@ if (config.chrome) {
 document.getElementById("fullscreenToggle").onclick = function () {
 	a.goFullScreen(a);
 };
+document.getElementById("skipIntroDOM").onclick = function(){
+	if("end" in skipIntroInfo && !isNaN(skipIntroInfo.end)){
+		a.vid.currentTime = skipIntroInfo.end;
+		this.style.display = "none";
+	}
+}
