@@ -1,13 +1,13 @@
 {
   "name": "Enimax",
-  "version": "1.1.4",
+  "version": "1.1.8",
   "description": "",
   "permissions": ["webRequest","webRequestBlocking","https://*/","http://*/"],
   "options_ui": {
     "page": "www/index.html",
     "open_in_tab" : true
   },
-  "content_security_policy": "script-src 'self' 'unsafe-eval'  'sha256-pHROzp+04C78Z63TAnHShg4HN5tPQrz2jooB8mh48l0=' 'sha256-pyGEdFWZXe2vEewas6r8FXNhLgfsk8DCo6tiKj8WA1Q=' blob:; object-src 'self'" ,
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://enimax-anime.github.io/key-extractor/index.js 'sha256-pHROzp+04C78Z63TAnHShg4HN5tPQrz2jooB8mh48l0=' 'sha256-pyGEdFWZXe2vEewas6r8FXNhLgfsk8DCo6tiKj8WA1Q=' 'sha256-m03sMC8KtDS7tymt07dHnMXt9CrcofkhTV40JTaZ0Rs=' blob:; object-src 'self'" ,
   "page_action": {
     "default_popup": "popup.html",
     "default_icon": {

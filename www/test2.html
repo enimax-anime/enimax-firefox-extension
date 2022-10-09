@@ -2,95 +2,121 @@
     <head>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-        <script src="./assets/index.js"></script>
         <style>
             body{
                 margin: 0;
-                background-color: #161616;
+                /* background-color: #161616; */
             }
-            .categories{
-                height: 30px;
-                line-height: 30px;
-                font-size: 15px;
-                margin: 5px;
-                display: inline-block;
-                border-radius: 30px;
-                background-color: transparent;
-                border: 1px solid white;
-                color: white;
-                padding: 10px 20px 10px 20px;
-                font-family: 'Montserrat', sans-serif;
-
-
+            #container{
+                height:100%;
+                width:100%;
+                overflow-y:scroll;
+                position:absolute;
+                top:0;
+                left:0;
             }
 
-            #categoriesCon{
-                height: 60px;
-                width: 100%;
-                overflow-x: auto;
-                overflow-y: hidden;
-                white-space: nowrap;
-            }
-
-            #categoriesData{
-                height: calc(100% - 60px);
-                width: 100%;
-            }
-
-            .categoriesDataMain{
-                height: 100%;
-                width: 100%;
-                overflow-y: auto;
-                display: none;
+            #pullTab{
+                position: fixed;
+                top:0;
+                left: calc(50% - 20px);
+                height: 40px;
+                width: 40px;
+                border-radius: 20px;
+                pointer-events: none;
+                opacity: 0;
+                background-color: rgb(18, 18, 71);
+                transition-duration: 200ms; 
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23FFFFFF'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z'/%3E%3C/svg%3E");               
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: 60% 60%;
+                transform: rotate(0deg);
             }
         </style>
     </head>
     <body>
-        <div id="categoriesCon"></div>
-        <div id="categoriesData"></div>
+        <div id="container">
+            <div id="pullTab"></div>
 
-
+            <div style="width:10px;height:1000%;"></div>
+        </div>
         <script>
-            let categories = ["Recently watched", "To watch", "Airing", "Renewed"];
-            let categoriesID = [0, 31, 42, 43];
-            let catCon = document.getElementById("categoriesCon");
-            let catData = document.getElementById("categoriesData");
+            class pullToRefresh{
+                constructor(dom){
+                    this.dom = dom;
+                    let self = this;
+                    this.flag = true;
+                    this.iniY;
+                    this.dom.addEventListener("scroll", function(event){
+                        self.scrollEvent(event, self);
+                    });
 
-            function activeCat(x){
-                let thisCat = document.getElementById(`catData${x}`);
-                let thisCatClass = document.getElementsByClassName(`categoriesDataMain`);
+                    this.dom.addEventListener("touchstart", function(event){
+                        self.touchStart(event, self);
+                    }, {passive : true});
 
-                if(thisCat){
-                    for(let i = 0; i < thisCatClass.length; i++){
-                        if(thisCat == thisCatClass[i]){
-                            thisCatClass[i].style.display = "block";
-                        }else{
-                            thisCatClass[i].style.display = "none";
-                        }
+                    this.dom.addEventListener("touchmove", function(event){
+                        self.touchMove(event, self);
+                    }, {passive : true});
+
+                    this.dom.addEventListener("touchend", function(event){
+                        self.touchEnd(self);
+                    });
+
+                    this.dom.addEventListener("touchcancel", function(event){
+                        self.touchEnd(self);
+                    });
+                }
+
+                scrollEvent(event, self){
+                }
+
+                touchStart(event, self){
+                    const targetTouches = event.targetTouches;
+                    if(targetTouches.length == 1){
+                        self.iniY = targetTouches[0].clientY;   
                     }
                 }
+
+                touchMove(event, self){
+                    const targetTouches = event.targetTouches;
+                    if(targetTouches.length == 1){
+                        let y = targetTouches[0].clientY;  
+                        if(self.dom.scrollTop <= 0 && (self.iniY - y) < -20){
+                            if(self.flag){
+                                self.flag = false;
+                                let pullEvent = document.createEvent('Event');                            
+                                pullEvent.initEvent('pullstart', true, true);
+                                window.dispatchEvent(pullEvent);
+                            }else{
+                                self.flag = false;
+                                let pullEvent = document.createEvent('Event');   
+                                pullEvent.pullNum = Math.abs(self.iniY - y);                         
+                                pullEvent.initEvent('pullmove', true, true);
+                                window.dispatchEvent(pullEvent);
+                            }
+                        }else{
+                            self.touchEnd(self);
+                        }
+                    }else{
+                        self.touchEnd(self);
+                    }
+                }
+
+                touchEnd(self){
+                    if(self.flag){
+                        return;
+                    }
+                    self.flag = true;
+                    let pullEvent = document.createEvent('Event'); 
+                    pullEvent.initEvent('pullend', true, true);
+                    window.dispatchEvent(pullEvent);
+                }
+
             }
-            for(let i = 0; i < categories.length; i++){ 
-                let temp1 = createElement({
-                    "innerText" : categories[i],
-                    "class" : "categories"
-                });
 
-                temp1.setAttribute("data-i",categoriesID[i]);
-                
-                temp1.onclick = function(){
-                    activeCat(this.getAttribute("data-i"));
-                };
-
-
-                let temp2 = createElement({
-                    "class" : "categoriesDataMain",
-                    "id" : `catData${categoriesID[i]}`
-                });
-                
-                catCon.append(temp1);
-                catData.append(temp2);
-            }
+            
         </script>
     </body>
 </html>

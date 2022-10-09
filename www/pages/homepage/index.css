@@ -53,9 +53,27 @@ body {
 
 .accessItem {
     padding: 15px;
-    display: inline-block;
+    display: table-row;
+    text-align: left;
+}
+#tableCon{
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+}
+.accessTable{
+    display: table;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    border-spacing: 16px;
+    border-collapse: separate;
 }
 
+.tableCell{
+    display: table-cell;
+
+}
 #outlineColor {
     display: inline-block;
     border: 0px;
@@ -71,11 +89,58 @@ body {
     width: 100px;
 }
 
+#fmoviesBase {
+    display: inline-block;
+    border-radius: 10px;
+    height: 30px;
+    padding: 20px;
+    border: 0;
+    width: 150px;
+}
+
+#downloadTimeout {
+    display: inline-block;
+    border-radius: 10px;
+    height: 30px;
+    padding: 20px;
+    border: 0;
+    width: 100px;
+}
+
 #themeColor {
     display: inline-block;
     border: 0px;
 
 
+}
+
+.snappedCustomRooms{
+    scroll-snap-type: x mandatory;
+    display: flex;
+    flex-direction: row;
+    overflow-y: hidden !important;
+    overflow-x: auto;
+    width:100% !important;
+    height: 100% !important;
+}
+
+.snappedCategoriesDataMain {
+    min-width: 100%;
+    width: 100%;
+    display: flex !important;
+    scroll-snap-align: center;
+    max-height: 100%;
+    height: 100%;
+    overflow-y: auto;
+    scroll-snap-stop: always;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+
+#custom_rooms{
+    width:100%;
+    height: auto;
+    overflow-y: auto;
 }
 
 .queuePlay {
@@ -245,9 +310,13 @@ body {
 }
 
 #home {
+    position: absolute;
+    top:0;
+    left:0;
     display: flex;
     flex-direction: column;
     height: 100%;
+    width: 100%;
 }
 
 .s_card {

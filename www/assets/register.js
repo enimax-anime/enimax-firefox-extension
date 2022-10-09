@@ -75,13 +75,16 @@ function deviceReady() {
                 sendNoti([2, "red", "Error", data.message]);
             }
         }).catch(function (data) {
-            console.log(data);
             try {
-                sendNoti([2, "red", "Error", JSON.parse(data).message]);
+                sendNoti([0, "red", "Error", JSON.parse(data).message]);
 
             } catch (err) {
-                sendNoti([2, "red", "Error", "Couldn't sign you up"]);
-
+                try{
+                    let error = data.toString();
+                    sendNoti([0, "red", "Error", "Couldn't sign you up. Make sure that the server-url is correct. Error message: " + error]);
+                }catch(err){
+                    sendNoti([0, "red", "Error", "Couldn't sign you up. Make sure that the server-url is correct. Error message: " + data]);
+                }
             }
         });
 

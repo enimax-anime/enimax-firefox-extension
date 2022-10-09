@@ -1,20 +1,45 @@
 let localVal = localStorage.getItem("local");
 if (localVal != "true" && localVal != "false") {
     localStorage.setItem("local", "true");
+    config.local = true;
+}
+let currentResolve;
+let currentReject;
+let fmoviesBaseURL = !localStorage.getItem("fmoviesBaseURL") ? "fmovies.app" : localStorage.getItem("fmoviesBaseURL");
 
+function setFmoviesBase(){
+    fmoviesBaseURL = !localStorage.getItem("fmoviesBaseURL") ? "fmovies.app" : localStorage.getItem("fmoviesBaseURL");
 }
 
-var config = {
-    "local": localStorage.getItem("local") === "true",
-    "remote": localStorage.getItem("remote"),
-    "remoteWOport": localStorage.getItem("remoteWOport"),
-    "chrome" : true,
-    "firefox" : true,
-    "beta" : false,
+function extractKey(id, url = null) {
+    return (new Promise(async function (resolve, reject) {
+        let scr;
+        if(url == null){
+            if(id == 6){
+                scr = (await MakeFetch(`https://rapid-cloud.co/js/player/prod/e6-player.min.js?v=${(new Date()).getTime()}`));
+            }else{
+                scr = (await MakeFetch(`https://rabbitstream.net/js/player/prod/e4-player.min.js?v=${(new Date()).getTime()}`));                
+            }
+        }else{
+            scr = (await MakeFetch(url));
+        }
+        
+        scr = extractKeyComp(4,scr);
+        if(scr[1]){
+            resolve(scr[0]);
+        }else{
+            currentResolve = resolve;
+            currentReject = reject;
 
-};
+            setTimeout(function () {
+                reject("timeout");
+            }, 3000);
 
+            document.getElementById("evalScript").contentWindow.postMessage(scr[0], "*");
+        }
+    }));
 
+}
 
 async function MakeFetch(url, options) {
     return new Promise(function (resolve, reject) {
@@ -38,26 +63,53 @@ var MakeCusReqFmovies = async function (url, options) {
 }
 
 
-if(config && config.chrome){
+if (config && config.chrome) {
     chrome.webRequest.onBeforeSendHeaders.addListener(
-        function(details) {
-          for(x in customHeaders){
-            details.requestHeaders.push({
-                "name" : x,
-                "value" : customHeaders[x]
-              });
-          }
+        function (details) {
+            for (x in customHeaders) {
+                details.requestHeaders.push({
+                    "name": x,
+                    "value": customHeaders[x]
+                });
+            }
 
 
-          
-          return { requestHeaders: details.requestHeaders };
+
+            return { requestHeaders: details.requestHeaders };
         },
-        {urls: ['https://fmovies.app/*','https://streamrapid.ru/*']},
+        { urls: ['https://fmovies.app/*', 'https://streamrapid.ru/*'] },
         ['blocking', 'requestHeaders']
-      );
+    );
 
-    MakeCusReqFmovies = async function(url,options){
-        if("headers" in options){
+    chrome.webRequest.onBeforeSendHeaders.addListener(
+        function (details) {
+            details.requestHeaders.push({
+                "name": "origin",
+                "value": extensionList[3].config.origin
+            });
+
+            details.requestHeaders.push({
+                "name": "referer",
+                "value": extensionList[3].config.referer
+            });
+
+            details.requestHeaders.push({
+                "name": "sid",
+                "value": localStorage.getItem("sid")
+            });
+
+
+
+
+
+            return { requestHeaders: details.requestHeaders };
+        },
+        { urls: ['https://*.dayimage.net/*'] },
+        ['blocking', 'requestHeaders']
+    );
+
+    MakeCusReqFmovies = async function (url, options) {
+        if ("headers" in options) {
             customHeaders = options["headers"];
         }
 
@@ -74,90 +126,6 @@ if(config && config.chrome){
 }
 
 
-function getTokenFromUrl(url, key) {
-
-    return (new Promise(async function (resolve, reject) {
-
-
-        const inappRef = cordova.InAppBrowser.open(url, '_blank', 'hidden=yes');
-
-        let messageCallBack = function (params) {
-            if (params.data.status == 200) {
-                resolve(params.data.data);
-                inappRef.close();
-            } else {
-                reject("err");
-                inappRef.show();
-            }
-
-        }
-
-        let loadStopCallback = function () {
-            let captchaKey = key;
-
-            inappRef.executeScript({
-                'code': `window.resultInApp=0;var a1=document.createElement("script");
-                    a1.innerHTML=\`var recaptcha_site_key = '${captchaKey}'\`;
-                    document.body.append(a1);
-                    var a2=document.createElement("script");
-                    a2.src="https://www.google.com/recaptcha/api.js?render=${captchaKey}";
-                    document.body.append(a2);`
-            });
-
-            inappRef.executeScript({
-                'code': `
-            var countTimeout = 0;
-            var timeout = setInterval(function(){
-                countTimeout++;
-                if(countTimeout >= 50){
-                    clearInterval(timeout);
-                }
-                if(typeof grecaptcha!=='undefined' && typeof grecaptcha.execute!=='undefined'){
-                    clearInterval(timeout);
-
-                    grecaptcha.ready(function(){      
-    
-                        grecaptcha.execute(recaptcha_site_key).then(function(x){
-                
-                            let resultInApp={'status':200,'data':x};
-                            webkit.messageHandlers.cordova_iab.postMessage(JSON.stringify(resultInApp));
-                        }).catch(function(x){
-                            let resultInApp={'status':400,'data':x};
-                            webkit.messageHandlers.cordova_iab.postMessage(JSON.stringify(resultInApp));
-
-                        });
-                    });
-                }
-            },200);
-            
-                    
-            `
-            });
-
-        };
-        inappRef.addEventListener('message', messageCallBack);
-        inappRef.addEventListener('loaderror', function () {
-        });
-
-        inappRef.addEventListener('loadstart', function () {
-        });
-
-        inappRef.addEventListener('beforeload', function () {
-        });
-
-        inappRef.addEventListener('loadstop', loadStopCallback);
-
-
-
-
-
-    }));
-
-}
-
-
-
-
 var wco = {
     'searchApi': function (query) {
         return (new Promise(function (resolve, reject) {
@@ -170,7 +138,7 @@ var wco = {
             }).then(response => response.text()).then(function (x) {
 
                 let temp = document.createElement("div");
-                temp.innerHTML = x;
+                temp.innerHTML = DOMPurify.sanitize(x);
 
 
                 var main_div = temp.querySelector(".items").children;
@@ -212,25 +180,23 @@ var wco = {
             url = "https://www.wcoforever.net/" + url;
             fetch(url).then(response => response.text()).then(function (response) {
                 let temp = document.createElement("div");
-                temp.innerHTML = response;
+                temp.innerHTML = DOMPurify.sanitize(response);
                 let data = {};
                 data.name = temp.querySelectorAll(".video-title")[0].innerText;
                 data.image = temp.querySelector("#sidebar_cat").querySelectorAll(".img5")[0].getAttribute("src");
-                console.log(data.image);
-                
-                if(data.image.indexOf("//") == 0){
+
+                if (data.image.indexOf("//") == 0) {
                     data.image = "https:" + data.image;
                 }
 
-                console.log(data.image);
-                data.description = temp.querySelector("#sidebar_cat").querySelectorAll("p")[0].innerHTML;
+                data.description = temp.querySelector("#sidebar_cat").querySelectorAll("p")[0].innerText;
 
                 let episodesDOM = temp.querySelector("#sidebar_right3");
 
                 let animeEps = [];
                 let animeDOM = episodesDOM.querySelectorAll("a");
                 let animeName;
-                for (var i = animeDOM.length - 1; i >=0 ; i--) {
+                for (var i = animeDOM.length - 1; i >= 0; i--) {
                     animeEps.push({
                         "link": animeDOM[i].href.replace("https://www.wcoforever.net", "?watch=") + "&engine=0",
                         "title": animeDOM[i].innerText,
@@ -265,6 +231,7 @@ var wco = {
                 data.episodes = animeEps;
                 data.mainName = animeName;
 
+                temp.remove();
                 resolve(data);
             }).catch(function (err) {
                 reject(err);
@@ -334,12 +301,7 @@ var wco = {
                 "method": "GET",
             };
 
-            var option1 = {
-                'headers': {
-                    'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36 Edg/98.0.1108.43",
-                },
 
-            };
 
 
 
@@ -347,7 +309,7 @@ var wco = {
             let sources = [];
             var d = req1;
             var dom = document.createElement("div");
-            dom.innerHTML = d;
+            dom.innerHTML = DOMPurify.sanitize(d);
 
             var nextPrev = dom.getElementsByClassName("prev-next");
             var data = {};
@@ -355,18 +317,18 @@ var wco = {
                 data[nextPrev[npi].children[0].getAttribute("rel")] = (nextPrev[npi].children[0].getAttribute("href").replace("https://www.wcoforever.net", "")) + "&engine=0";
             }
 
+            let tempReg = /<script>var.+?document\.write\(decodeURIComponent\(escape.+?<\/script>/gis;
+            let tempRegOut = tempReg.exec(req1)[0];
+            let arrayReg = /\[.+\]/gis;
+            let main = "";
 
-            var a = dom.querySelectorAll("script");
-            var main = "";
-            for (var i = 0; i < a.length; i++) {
-                if (a[i].textContent.indexOf("document.write(decodeURIComponent(escape") > -1) {
-                    main = a[i].textContent;
-                }
-            }
+            let arrayRegOut = JSON.parse(arrayReg.exec(tempRegOut)[0]);
+            let num = parseInt(tempRegOut.split(`.replace(\/\\D\/g,'')) -`)[1]);
 
-            main = main.split("document.write")[0];
-            var Var_Name = main.split(" ")[1];
-            var out = eval((main + "\nmain=" + Var_Name));
+            arrayRegOut.forEach(function (value) {
+                main += String.fromCharCode(parseInt(atob(value).replace(/\D/g, '')) - num);
+            });
+
             main = "https://www.wcoforever.net" + main.split("src=\"")[1].split("\" ")[0];
 
             var req2 = await MakeFetch(main, {});
@@ -429,9 +391,10 @@ var wco = {
             data.episode = name_ep;
             data.status = 200;
             data.message = "done";
-
+            dom.remove();
             return data;
         } catch (err) {
+            console.error(err);
             alert("Couldn't get the link");
             return { "status": 400, "message": "Couldn't get the link" }
         }
@@ -463,7 +426,7 @@ var animixplay = {
             }).then(response => response.json())
                 .then(response => {
                     let temp = document.createElement("div");
-                    temp.innerHTML = response.result;
+                    temp.innerHTML = DOMPurify.sanitize(response.result);
                     let li = temp.querySelectorAll("li");
                     let data = [];
 
@@ -476,6 +439,7 @@ var animixplay = {
 
                     }
 
+                    temp.remove();
 
                     resolve({
                         "status": 200,
@@ -500,22 +464,22 @@ var animixplay = {
             url = "https://animixplay.to/" + url;
             fetch(url).then(response => response.text()).then(async function (response) {
                 let temp = document.createElement("div");
-                temp.innerHTML = response;
+                temp.innerHTML = DOMPurify.sanitize(response);
                 let data = {};
 
 
                 data.name = url.split("/")[url.split("/").length - 1].split("-").join(" ");
                 data.image = "";
                 data.description = "";
+                let temp2 = document.createElement("div");
 
                 try {
                     let malId = parseInt(response.split("malid = '")[1]);
                     let response2 = await MakeFetch(`https://myanimelist.net/anime/${malId}`, {});
-                    let temp2 = document.createElement("div");
-                    temp2.innerHTML = response2;
+                    temp2.innerHTML = DOMPurify.sanitize(response2, { ALLOWED_ATTR: ['itemprop'] });
 
                     data.image = temp2.querySelector('[itemprop="image"]').src;
-                    
+
 
                     if (data.image == null || data.image == undefined || data.image.trim() == "") {
                         data.image = temp2.querySelector('[itemprop="image"]').getAttribute('data-image');
@@ -529,6 +493,8 @@ var animixplay = {
                     data.description = temp2.querySelector('[itemprop="description"]').innerText;
                 } catch (err) {
                     console.error(err);
+                } finally {
+                    temp2.remove();
                 }
 
                 let animeEps = [];
@@ -555,6 +521,7 @@ var animixplay = {
 
                 data.episodes = animeEps;
                 data.mainName = animeName;
+                temp.remove();
                 resolve(data);
             }).catch(function (err) {
                 console.error(err);
@@ -574,9 +541,9 @@ var animixplay = {
             let data = {};
             let response = await MakeFetch(nextUrl, {});
             let temp = document.createElement("div");
-            temp.innerHTML = response;
+            temp.innerHTML = DOMPurify.sanitize(response);
             let animeDOM = JSON.parse(temp.querySelector("#epslistplace").innerHTML);
-
+            temp.remove();
             let episode = parseFloat(url.split("ep")[1]);
 
             if ((episode - 1).toString() in animeDOM) {
@@ -601,14 +568,14 @@ var animixplay = {
 
             let l = animeDOM[episode.toString()].split("id=")[1].split("&")[0]
 
-            function padding(string, len){
+            function padding(string, len) {
                 let length = len - string.length;
-                for(var i = 0; i < length; i++){
+                for (var i = 0; i < length; i++) {
                     string += "=";
                 }
-            
+
                 return string;
-                
+
             }
             function idToLink(id) {
 
@@ -624,14 +591,14 @@ var animixplay = {
 
             data.sources = [];
 
-            if(config.chrome){
-                let reqTimeout = setTimeout(function(){
+            if (config.chrome) {
+                let reqTimeout = setTimeout(function () {
                     chrome.webRequest.onHeadersReceived.removeListener(
                         callbackReq
-                      );
+                    );
                     reject("Timeout");
                 }, 3000);
-                function callbackReq(details){
+                function callbackReq(details) {
                     clearTimeout(reqTimeout);
                     let res = details.url;
                     res = atob(res.split("#")[1]);
@@ -646,23 +613,23 @@ var animixplay = {
                     data.message = "done";
                     chrome.webRequest.onHeadersReceived.removeListener(
                         callbackReq
-                      );
+                    );
                     resolve(data);
                 }
 
-                
-                
+
+
                 chrome.webRequest.onHeadersReceived.addListener(
                     callbackReq,
-                    {urls: ["https://plyr.link/*"]}
+                    { urls: ["https://plyr.link/*"] }
                 );
 
                 MakeFetch(`https://animixplay.to/api/live${link}`, {
                     method: 'GET'
                 });
 
-                
-            }else{
+
+            } else {
 
                 cordova.plugin.http.sendRequest(`https://animixplay.to/api/live${link}`, {
                     method: 'GET'
@@ -698,12 +665,12 @@ var fmovies = {
 
         query = decodeURIComponent(query);
         return (new Promise(function (resolve, reject) {
-            fetch(`https://fmovies.app/search/${query.replace(" ", "-")}`, {
+            fetch(`https://${fmoviesBaseURL}/search/${query.replace(" ", "-")}`, {
 
             }).then(response => response.text())
                 .then(response => {
                     let tempDOM = document.createElement("div");
-                    tempDOM.innerHTML = response;
+                    tempDOM.innerHTML = DOMPurify.sanitize(response);
                     let data = [];
 
                     var section = tempDOM.querySelectorAll(".flw-item");
@@ -716,8 +683,16 @@ var fmovies = {
                         let poster = current.querySelector(".film-poster");
                         let detail = current.querySelector(".film-detail");
 
+                        let temlLink = poster.querySelector("a").getAttribute("href");
+
+                        if (temlLink.includes("http")) {
+                            temlLink = new URL(temlLink);
+                            temlLink = temlLink.pathname;
+                        }
+
+
                         dataCur.image = poster.querySelector("img").getAttribute("data-src");
-                        dataCur.link = poster.querySelector("a").getAttribute("href").replace("https://www.fmovies.app", "") + "&engine=2";
+                        dataCur.link = temlLink + "&engine=2";
                         dataCur.name = detail.querySelector(".film-name").innerText.trim();
 
 
@@ -748,10 +723,10 @@ var fmovies = {
 
         async function getSeason(x, showURL) {
             try {
-                let r = await MakeFetch(`https://fmovies.app/ajax/v2/tv/seasons/${x}`);
+                let r = await MakeFetch(`https://${fmoviesBaseURL}/ajax/v2/tv/seasons/${x}`);
 
                 let temp = document.createElement("div");
-                temp.innerHTML = r;
+                temp.innerHTML = DOMPurify.sanitize(r);
                 let tempDOM = temp.getElementsByClassName("dropdown-item ss-item");
                 let data = {};
                 for (var i = 0; i < tempDOM.length; i++) {
@@ -760,9 +735,9 @@ var fmovies = {
 
 
 
-                r = await MakeFetch(`https://fmovies.app/${showURL}`);
+                r = await MakeFetch(`https://${fmoviesBaseURL}/${showURL}`);
                 let temp2 = document.createElement("div");
-                temp2.innerHTML = r;
+                temp2.innerHTML = DOMPurify.sanitize(r);
                 let data2 = {};
                 data2.name = temp2.querySelector(".movie_information").querySelector(".heading-name").innerText;
                 data2.img = temp2.querySelector(".movie_information").querySelector(".film-poster-img").src;
@@ -787,9 +762,9 @@ var fmovies = {
 
         async function getEpisode(x) {
             try {
-                let r = await MakeFetch(`https://fmovies.app/ajax/v2/season/episodes/${x}`);
+                let r = await MakeFetch(`https://${fmoviesBaseURL}/ajax/v2/season/episodes/${x}`);
                 let temp = document.createElement("div");
-                temp.innerHTML = r;
+                temp.innerHTML = DOMPurify.sanitize(r);
                 let tempDOM = temp.getElementsByClassName("nav-link btn btn-sm btn-secondary eps-item");
                 let data = [];
                 for (var i = 0; i < tempDOM.length; i++) {
@@ -876,9 +851,6 @@ var fmovies = {
 
     'getLinkFromUrl': function (url) {
 
-
-
-
         return (new Promise(async function (resolve, reject) {
             url = url.split("&engine");
             url = url[0];
@@ -913,10 +885,10 @@ var fmovies = {
                         link = link[link.length - 1];
                         link = link.split("?")[0];
 
-                        console.log(link, host, `${host}/ajax/embed-4/getSources?id=${link}&_token=3&_number=${6}`);
                         var second = await MakeCusReqFmovies(`${host}/ajax/embed-4/getSources?id=${link}&_token=3&_number=${6}`, option23);
 
                         let jsonq = JSON.parse(second);
+
                         resolve(jsonq);
 
                     } catch (err) {
@@ -965,11 +937,11 @@ var fmovies = {
                 let promise2;
                 if (split.length == 1) {
                     ep = split[0];
-                    promise2 = MakeCusReqFmovies(`https://fmovies.app/ajax/movie/episodes/${ep}`, option);
+                    promise2 = MakeCusReqFmovies(`https://${fmoviesBaseURL}/ajax/movie/episodes/${ep}`, option);
                 } else {
                     ep = split[1];
 
-                    promise2 = MakeCusReqFmovies(`https://fmovies.app/ajax/v2/episode/servers/${ep}`, option)
+                    promise2 = MakeCusReqFmovies(`https://${fmoviesBaseURL}/ajax/v2/episode/servers/${ep}`, option)
                 }
 
                 Promise.all([promise2]).then(async (tokens) => {
@@ -984,7 +956,7 @@ var fmovies = {
 
 
                         var dom = document.createElement("div");
-                        dom.innerHTML = getLink2;
+                        dom.innerHTML = DOMPurify.sanitize(getLink2);
 
                         let tempDOM = dom.getElementsByClassName("nav-link btn btn-sm btn-secondary");
 
@@ -1011,7 +983,7 @@ var fmovies = {
 
 
                         var dom = document.createElement("div");
-                        dom.innerHTML = getLink2;
+                        dom.innerHTML = DOMPurify.sanitize(getLink2);
                         let tempDOM = dom.getElementsByClassName("nav-link btn btn-sm btn-secondary");
 
                         for (var i = 0; i < tempDOM.length; i++) {
@@ -1029,19 +1001,19 @@ var fmovies = {
                     }
 
 
-                    let getSeason = await MakeFetch(`https://fmovies.app/watch-${url.split(".")[0]}.${server}`);
+                    let getSeason = await MakeFetch(`https://${fmoviesBaseURL}/watch-${url.split(".")[0]}.${server}`);
 
                     let tempGetDom = document.createElement("div");
 
-                    tempGetDom.innerHTML = getSeason;
+                    tempGetDom.innerHTML = DOMPurify.sanitize(getSeason);
                     currentSeason = tempGetDom.querySelector(".detail_page-watch").getAttribute("data-season");
                     tempGetDom.remove();
 
                     if (currentSeason != "") {
-                        let r = await MakeFetch(`https://fmovies.app/ajax/v2/season/episodes/${currentSeason}`);
+                        let r = await MakeFetch(`https://${fmoviesBaseURL}/ajax/v2/season/episodes/${currentSeason}`);
 
                         let temp = document.createElement("div");
-                        temp.innerHTML = r;
+                        temp.innerHTML = DOMPurify.sanitize(r);
                         let tempDOM = temp.getElementsByClassName("nav-link btn btn-sm btn-secondary eps-item");
                         for (var i = 0; i < tempDOM.length; i++) {
                             if (ep == tempDOM[i].getAttribute("data-id")) {
@@ -1055,15 +1027,21 @@ var fmovies = {
                             }
 
                         }
+                        temp.remove();
 
                     }
 
-                    let getLink = await MakeCusReqFmovies(`https://fmovies.app/ajax/get_link/${server}`, option);
+                    let getLink = await MakeCusReqFmovies(`https://${fmoviesBaseURL}/ajax/get_link/${server}`, option);
 
                     var title_get = JSON.parse(getLink).title;
                     var link = JSON.parse(getLink).link;
-                    let ytr = await getLinkFromStream(link);
-
+                    let sourceJSON = await getLinkFromStream(link);
+                    console.log(sourceJSON);
+                    let encryptedURL = sourceJSON.sources;
+                    let decryptKey = await extractKey(4);
+                    console.log(decryptKey);
+                    let tempFile = JSON.parse(CryptoJS.AES.decrypt(encryptedURL, decryptKey).toString(CryptoJS.enc.Utf8));
+                    sourceJSON.sources = tempFile;
 
                     data.status = 200;
                     data.message = "done";
@@ -1078,12 +1056,12 @@ var fmovies = {
                     data.nameWSeason = url.split("/watch-")[1].split("-online")[0] + "-" + currentSeason;
 
                     data.sources = [{
-                        "url": ytr.sources[0].file,
+                        "url": sourceJSON.sources[0].file,
                         "name": "hls",
                         "type": "hls",
                     }];
 
-                    data.subtitles = ytr.tracks;
+                    data.subtitles = sourceJSON.tracks;
 
                     resolve(data);
 
@@ -1127,7 +1105,7 @@ var zoro = {
             fetch(`https://zoro.to/search?keyword=${query}`).then(res => res.text()).then(function (a) {
                 let dom = document.createElement("div");
                 let orDom = dom;
-                dom.innerHTML = a;
+                dom.innerHTML = DOMPurify.sanitize(a);
                 dom = dom.querySelectorAll('.flw-item');
                 let data = [];
                 for (var i = 0; i < dom.length; i++) {
@@ -1159,8 +1137,8 @@ var zoro = {
         let response = {};
         let _res = ((await MakeFetch(`https://zoro.to/${url}`, {})));
         let _dom = document.createElement("div");
-        ogDOM = _dom;
-        _dom.innerHTML = _res;
+        let ogDOM = _dom;
+        _dom.innerHTML = DOMPurify.sanitize(_res);
 
         response.name = _dom.querySelector(".film-name.dynamic-name").innerText;
 
@@ -1168,7 +1146,7 @@ var zoro = {
         response.description = _dom.querySelector(".film-description.m-hide").innerText;
 
         let name = url;
-        name = name.replace("?watch=","").split("&ep=")[0].split("-");
+        name = name.replace("?watch=", "").split("&ep=")[0].split("-");
         name.pop();
         name = name.join("-");
         response.mainName = name;
@@ -1183,7 +1161,7 @@ var zoro = {
 
         let dom = document.createElement("div");
         ogDOM = dom;
-        dom.innerHTML = res;
+        dom.innerHTML = DOMPurify.sanitize(res);
         dom = dom.querySelectorAll('.ep-item');
         let data = [];
 
@@ -1211,7 +1189,7 @@ var zoro = {
 
             let dom = document.createElement("div");
             ogDOM = dom;
-            dom.innerHTML = res;
+            dom.innerHTML = DOMPurify.sanitize(res);
             dom = dom.querySelectorAll('.ep-item');
             let data = [];
 
@@ -1247,45 +1225,51 @@ var zoro = {
 
         let dom = document.createElement("div");
         let ogDOM = dom;
-        dom.innerHTML = domIn;
+        dom.innerHTML = DOMPurify.sanitize(domIn);
 
         dom = dom.querySelectorAll('[data-server-id="4"]');
 
         let sourceURLs = [];
         let subtitles = [];
-        
+
 
         for (var i = 0; i < dom.length; i++) {
-                let sources = await MakeFetch(`https://zoro.to/ajax/v2/episode/sources?id=${dom[i].getAttribute('data-id')}`, {});
-                sources = JSON.parse(sources).link;
-                let urlHost = (new URL(sources)).origin;
+            let sources = await MakeFetch(`https://zoro.to/ajax/v2/episode/sources?id=${dom[i].getAttribute('data-id')}`, {});
+            sources = JSON.parse(sources).link;
+            let urlHost = (new URL(sources)).origin;
 
 
-                let sourceId = sources.split("/");
-                sourceId = sourceId[sourceId.length - 1];
-                sourceId = sourceId.split("?")[0];
+            let sourceId = sources.split("/");
+            sourceId = sourceId[sourceId.length - 1];
+            sourceId = sourceId.split("?")[0];
 
 
-                let sourceJSON = JSON.parse((await MakeFetch(`${urlHost}/ajax/embed-6/getSources?id=${sourceId}&sId=lihgfedcba-abcde`, {})));
-                try{
-                    for(let j = 0; j < sourceJSON.tracks.length; j++){
-                        sourceJSON.tracks[j].label += " - " +dom[i].getAttribute('data-type');
-                        if(sourceJSON.tracks[j].kind == "captions"){
-                            subtitles.push(sourceJSON.tracks[j]);
-                        }
+            let sourceJSON = JSON.parse((await MakeFetch(`${urlHost}/ajax/embed-6/getSources?id=${sourceId}&sId=lihgfedcba-abcde`, {})));
+            try {
+                for (let j = 0; j < sourceJSON.tracks.length; j++) {
+                    sourceJSON.tracks[j].label += " - " + dom[i].getAttribute('data-type');
+                    if (sourceJSON.tracks[j].kind == "captions") {
+                        subtitles.push(sourceJSON.tracks[j]);
                     }
-                }catch(err){
+                }
+            } catch (err) {
 
+            }
+            try {
+                if (sourceJSON.encrypted) {
+                    let encryptedURL = sourceJSON.sources;
+                    let decryptKey = await extractKey(6);
+                    let tempFile = JSON.parse(CryptoJS.AES.decrypt(encryptedURL, decryptKey).toString(CryptoJS.enc.Utf8));
+                    sourceJSON.sources = tempFile;
                 }
-                try{
-                    let tempSrc = {"url":sourceJSON.sources[0].file , "name":"HLS#"+dom[i].getAttribute('data-type'), "type":"hls"};
-                    if("intro" in sourceJSON && "start" in sourceJSON.intro && "end" in sourceJSON.intro){
-                        tempSrc.skipIntro = sourceJSON.intro;   
-                    }
-                    sourceURLs.push(tempSrc);
-                }catch(err){
-                    console.error(err);
+                let tempSrc = { "url": sourceJSON.sources[0].file, "name": "HLS#" + dom[i].getAttribute('data-type'), "type": "hls" };
+                if ("intro" in sourceJSON && "start" in sourceJSON.intro && "end" in sourceJSON.intro) {
+                    tempSrc.skipIntro = sourceJSON.intro;
                 }
+                sourceURLs.push(tempSrc);
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         let links = await getEpisodeListFromAnimeId(animeId, episodeId);
@@ -1312,16 +1296,16 @@ var zoro = {
 
         resp = { "sources": sourceURLs, "episode": epNum };
 
-        if(next != null){
+        if (next != null) {
             resp.next = next;
         }
 
-        if(prev != null){
+        if (prev != null) {
             resp.prev = prev;
         }
 
         let name = url;
-        name = name.replace("?watch=","").split("&ep=")[0].split("-");
+        name = name.replace("?watch=", "").split("&ep=")[0].split("-");
         name.pop();
         name = name.join("-");
 
@@ -1333,10 +1317,10 @@ var zoro = {
         return resp;
 
     },
-    "config" : {
-        "socketURL" : "https://ws1.rapid-cloud.co",
-        "origin" : "https://rapid-cloud.co",
-        "referer" : "https://rapid-cloud.co/",
+    "config": {
+        "socketURL": "https://ws1.rapid-cloud.co",
+        "origin": "https://rapid-cloud.co",
+        "referer": "https://rapid-cloud.co/",
     }
 };
 
@@ -1345,7 +1329,7 @@ const extensionNames = ["WCOforever", "Animixplay", "Fmovies", "Zoro"];
 
 
 
-localStorage.setItem("version", "1.1.4");
+localStorage.setItem("version", "1.1.8");
 if (localStorage.getItem("lastUpdate") === null) {
     localStorage.setItem("lastUpdate", "0");
 

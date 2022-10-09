@@ -5,15 +5,18 @@
 <link rel="icon" type="image/png" sizes="32x32" href="assets/images/32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/images/16.png">
 <meta name="theme-color" content="#4b4bc2">
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' https://enimax-anime.github.io/key-extractor/index.js 'unsafe-inline' blob:; object-src 'self'">
 <title>Enimax</title>
 
 <link href="notification/noti.css" rel="stylesheet">
+<script type="text/javascript" src="assets/config.js"></script>
+<script type="text/javascript" src="extensions/index.js"></script>
 <script type="text/javascript" src="assets/dexie.js"></script>
+<script type="text/javascript" src="assets/crypto.js"></script>
 <script type="text/javascript" src="assets/dexie-export-import.js"></script>
-
 <script type="text/javascript" src="assets/socket.js"></script>
 <script type="text/javascript" src="notification/noti.js"></script>
-<script type="text/javascript" src="extensions/index.js"></script>
+<script type="text/javascript" src="assets/purify.js"></script>
 <script type="text/javascript" src="assets/m3u8-parser.js"></script>
 <script type="text/javascript" src="storage/index.js"></script>
 <script type="text/javascript" src="storage/download.js"></script>
@@ -72,6 +75,10 @@
         height:  200px !important;
 				
     }
+
+    #evalScript{
+        display: none;
+    }
 </style>
 
 
@@ -82,9 +89,7 @@
 
     <iframe src="" id="frame"></iframe>
     <iframe src="fallback.html" id="player" ></iframe>
-
-
-
+    <iframe src="eval.html" id="evalScript" sandbox="allow-scripts"></iframe>
 
 
 
