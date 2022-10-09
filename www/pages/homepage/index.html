@@ -2,6 +2,7 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' blob:; object-src 'self'">
   <link href="../../notification/noti.css" rel="stylesheet">
   <link href="../../assets/index.css" rel="stylesheet">
   <link href="index.css" rel="stylesheet">
@@ -12,11 +13,13 @@
   <script type="text/javascript" src="../../notification/noti.js"></script>
   <script type="text/javascript" src="../../assets/dexie.js"></script>
   <script type="text/javascript" src="../../assets/index.js"></script>
+  <script type="text/javascript" src="../../assets/pull.js"></script>
 
 </head>
 
 <body>
   <div class="con_black"></div>
+  <div id="pullTab"></div>
   <div id="con_11">
 
 
@@ -40,6 +43,8 @@
       <div class="menuItem" id="changeServerDiv">Change server</div>
       <div class="menuItem" id="logout">Log out</div>
       <div class="menuItem" id="exportData" style="display:none;">Export Data</div>
+      <div class="menuItem" id="testExtensions" style="display:none;">Test Extensions</div>
+      <div class="menuItem" id="testKey" style="display:none;">Test key</div>
       <div class="menuItem" id="importData" style="display:none;"><label for="importFile">Import Data</label><input type="file" id="importFile"></div>
       <div class="menuItem" id="resetSource" style="display:none;">Reset source preference
       </div>
@@ -99,26 +104,101 @@
       <div id="activeCon"></div>
 
       <div style="color:white;font-size: 30px;">
-        <div class="queueRemove" id="doneRemove"></div> Done Queue
+        <div class="queueRemove" id="errorRemove"></div> Errored
+      </div>
+      <div id="errorCon"></div>
+      
+      <div style="color:white;font-size: 30px;">
+        <div class="queueRemove" id="doneRemove"></div> Done
       </div>
       <div id="doneCon"></div>
+
+
+      
     </div>
 
     <div id="accessabilityCon" class="con_main" style="white-space: normal;color: white;flex-direction: column; justify-content: center;">
       <div class="close_con closeDom"></div>
-      <div class="accessItem"> Outline Color : &nbsp;&nbsp;<input type="color" id="outlineColor"></div>
+      <div id="tableCon">
+        <div class="accessTable">
+          <div class="accessItem">
+            <div class="tableCell">Outline Color</div>
+            <div class="tableCell"><input type="color" id="outlineColor"></div>
+          </div>
 
-      <div class="accessItem"> Outline Width : &nbsp;&nbsp;<input type="text"  id="outlineWidth"></div>
+          <div class="accessItem">
+            <div class="tableCell">Theme Color</div>
+            <div class="tableCell"><input type="color" id="themeColor"></div>
+          </div>
 
-      <div class="accessItem"> Theme Color : &nbsp;&nbsp;<input type="color" id="themeColor"></div>
-      <div class="accessItem"> Scroll to the current episode : &nbsp;&nbsp;
-        
-        <label class="switch" style="vertical-align: middle;">
-          <input type="checkbox" id="scrollBool">
-          <span class="slider round"></span>
-        </label>
+          <div class="accessItem">
+            <div class="tableCell">Outline Width</div>
+            <div class="tableCell"><input type="text"  id="outlineWidth"></div>
+          </div>
+
+          <div class="accessItem">
+            <div class="tableCell">Fmovies Base url</div>
+            <div class="tableCell"><input type="text"  id="fmoviesBase"></div>
+          </div>
+
+          <div class="accessItem notChrome">
+            <div class="tableCell">Timeout for downloads (in seconds)</div>
+            <div class="tableCell"><input type="text"  id="downloadTimeout"></div>
+          </div>
+
+          <div class="accessItem">
+            <div class="tableCell">Scroll to the current episode</div>
+            <div class="tableCell">          
+              <label class="switch access" style="vertical-align: middle;">
+                <input type="checkbox" id="scrollBool">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+
+
+          <div class="accessItem notChrome">
+            <div class="tableCell">Pause downloads when not on WI-FI </div>
+            <div class="tableCell">
+              <label class="switch access" style="vertical-align: middle;">
+                <input type="checkbox" id="autoPause">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+
+
+          <div class="accessItem notChrome">
+            <div class="tableCell">Hide download notifications when app is in background</div>
+            <div class="tableCell">
+              <label class="switch access" style="vertical-align: middle;">
+                <input type="checkbox" id="hideNotification">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="accessItem">
+            <div class="tableCell">Turn off fancy-pants homescreen</div>
+            <div class="tableCell">
+              <label class="switch access" style="vertical-align: middle;">
+                <input type="checkbox" id="fancyHome">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="accessItem notChrome">
+            <div class="tableCell">Use the downloaded version of a video even when offline-mode is off.</div>
+            <div class="tableCell">
+              <label class="switch access" style="vertical-align: middle;">
+                <input type="checkbox" id="alwaysDown">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+        </div>
       </div>
-
     </div>
 
 
@@ -137,13 +217,14 @@
       </div>
 
       <div id="categoriesCon"></div>      
-      <div style="width:100%;height: auto;overflow-y: auto;" id="custom_rooms"></div>
+      <div id="custom_rooms"></div>
     </div>
 
   </div>
 
   <script type="text/javascript" src="../../assets/Sortable.js"></script>
-  <script type="text/javascript" src="../../extensions/index.js"></script>
+  <script type="text/javascript" src="../../assets/purify.js"></script>
+  <script type="text/javascript" src="../../assets/config.js"></script>
   <script type="text/javascript" src="index.js"></script>
 
 

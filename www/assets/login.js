@@ -79,7 +79,6 @@ function deviceReady(){
                 sendNoti([2, "red", "Error", "Couldn't log you in"]);
             }
         }).catch(function (data) {
-            console.log(data);
             try {
                 sendNoti([2, "red", "Error", JSON.parse(data).message]);
 

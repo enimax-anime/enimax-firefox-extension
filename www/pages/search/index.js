@@ -1,5 +1,10 @@
+const extensionNames = window.parent.returnExtensionNames();
+const extensionList = window.parent.returnExtensionList();
 
 let sourcesNames = extensionNames;
+let pullTabArray = [];
+
+pullTabArray.push(new pullToRefresh(document.getElementById("mainConSearch")));
 
 for (var i = 0; i < extensionList.length; i++) {
     let atr = {
@@ -27,14 +32,13 @@ document.getElementById("searchBox").onclick = function () {
     openSearch();
 }
 
-document.getElementById("s_c").onclick = function () {
-    close_search();
+document.getElementById("s_c").onclick = function (event) {
+    close_search(event);
 
 }
 
 
 document.getElementById("search_x").onkeydown = function (event) {
-    console.log(event);
     if (event.keyCode == 13) {
         search();
     }
@@ -52,7 +56,7 @@ function openSearch() {
     document.getElementsByClassName('searchInput')[0].style.paddingLeft = '40px';
     document.getElementsByClassName('searchButton')[0].onclick = function () { search(); }
 }
-function close_search() {
+function close_search(event) {
     document.getElementById('s_c').style.display = 'none';
     document.getElementsByClassName('searchInput')[0].style.width = '0';
     document.getElementsByClassName('searchBox')[0].style.width = '40px';
@@ -63,6 +67,10 @@ function close_search() {
 
 
 
+document.getElementById("searchForm").onsubmit = function(event){
+    event.preventDefault();
+    search();
+};
 
 function search() {
     document.getElementById("mainConSearch").innerHTML = "<div style='margin:auto;'>Loading...</div>";
@@ -79,7 +87,9 @@ function search() {
             currentEngine = extensionList[currentEngine];
         }
     }
-
+    if(document.getElementById('search_x').value === "devmode"){
+        localStorage.setItem("devmode", "true");
+    }
     currentEngine.searchApi(document.getElementById('search_x').value).then(function (x) {
 
         let main_div = x.data;
@@ -127,9 +137,8 @@ function search() {
 
 
     }).catch(function (x) {
-        console.log(x);
+        console.error(x);
         document.getElementById("mainConSearch").innerHTML = "Error";
-
         sendNoti([0, null, "Message", x.data]);
 
     });
@@ -137,28 +146,4 @@ function search() {
 
 }
 
-
-
-// function applyTheme() {
-//     var themeColorL = localStorage.getItem("themecolor");
-//     if (themeColorL && themeColorL != undefined && themeColorL != null) {
-//         document.documentElement.style.setProperty('--theme-color', themeColorL);
-//     } else {
-//         document.documentElement.style.setProperty('--theme-color', "#4b4bc2");
-
-//     }
-
-// }
-
-
-// function changeTheme() {
-//     let promptT = prompt("Enter the theme color", "#4b4bc2");
-//     if (promptT.trim() != "" && promptT != null && promptT != undefined) {
-//         localStorage.setItem("themecolor", promptT);
-//         applyTheme()
-//     } else {
-
-//     }
-// }
-
-// applyTheme();
+applyTheme();

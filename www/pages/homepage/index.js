@@ -1,6 +1,143 @@
 window.parent.postMessage({ "action": 1, data: "any" }, "*");
 
+if(config.chrome){
+    let chromeDOM = document.getElementsByClassName("notChrome");
+    for(let i = 0; i < chromeDOM.length; i++){
+        chromeDOM[i].style.display = "none";
+    }
+}
 
+let downloadedFolders = {};
+let pullTabArray = [];
+let errDOM = document.getElementById("errorCon");
+
+async function populateDownloadedArray(){
+    try{
+        downloadedFolders = {};
+        let temp = await window.parent.listDir("");
+        for(let i = 0; i < temp.length; i++){
+            if(temp[i].isDirectory){
+                downloadedFolders[temp[i].name] = true;
+            }
+        }
+    }catch(err){
+
+    }
+}
+
+async function testIt(){
+    let extensionList = window.parent.returnExtensionList();
+    let extensionNames = window.parent.returnExtensionNames();
+    let searchQuery = "odd";
+    let errored = false;
+    for(let i = 0; i < extensionList.length; i++){
+        let searchResult, episodeResult, playerResult;
+        try{
+            searchResult = (await extensionList[i].searchApi(searchQuery)).data;
+        }catch(err){
+            errored = true;
+            alert(`${extensionNames[i]} - search :  ${err.toString()}`);
+        }
+
+        try{
+            let tempSea = searchResult[0].link;
+            if(tempSea[0] == "/"){
+                tempSea = tempSea.substring(1);
+            }
+            episodeResult = (await extensionList[i].getAnimeInfo(tempSea));
+        }catch(err){
+            errored = true;
+            alert(`${extensionNames[i]} - episode :  ${err.toString()}`);
+        }
+
+        try{
+            playerResult = await extensionList[i].getLinkFromUrl(episodeResult.episodes[0].link.replace("?watch=", ""));
+        }catch(err){
+            console.error(err);
+            errored = true;
+            alert(`${extensionNames[i]} - player :  ${err.toString()}`);
+        }
+
+        alert(`${extensionNames[i]} - Here's the link: ${playerResult.sources[0].url}`);
+    }
+
+    if(!errored){
+        alert("Everything seems to be working fine");
+    }
+}
+async function testKey(){
+    try{
+        alert(await window.parent.extractKey(4));
+    }catch(err){
+        alert("Fmovies failed");
+    }
+
+    try{
+        alert(await window.parent.extractKey(6));
+    }catch(err){
+        alert("zoro failed");
+    }
+
+    // return;
+
+    
+    try{
+
+        let links = ["main-2022-10-04-08-16-31.js","main-2022-10-04-19-00-01.js","main-2022-10-05-06-00-01.js","main-2022-10-05-17-00-01.js","main-2022-10-04-08-30-01.js","main-2022-10-04-19-30-01.js","main-2022-10-05-06-30-02.js","main-2022-10-05-17-30-01.js","main-2022-10-04-09-00-02.js","main-2022-10-04-20-00-01.js","main-2022-10-05-07-00-01.js","main-2022-10-05-18-00-01.js","main-2022-10-04-09-30-01.js","main-2022-10-04-20-30-01.js","main-2022-10-05-07-30-01.js","main-2022-10-05-18-30-01.js","main-2022-10-04-10-00-01.js","main-2022-10-04-21-00-01.js","main-2022-10-05-08-00-01.js","main-2022-10-05-19-00-01.js","main-2022-10-04-10-30-01.js","main-2022-10-04-21-30-01.js","main-2022-10-05-08-30-01.js","main-2022-10-05-19-30-01.js","main-2022-10-04-11-00-01.js","main-2022-10-04-22-00-01.js","main-2022-10-05-09-00-01.js","main-2022-10-05-20-00-01.js","main-2022-10-04-11-30-01.js","main-2022-10-04-22-30-01.js","main-2022-10-05-09-30-01.js","main-2022-10-05-20-30-01.js","main-2022-10-04-12-00-01.js","main-2022-10-04-23-00-01.js","main-2022-10-05-10-00-01.js","main-2022-10-05-21-00-02.js","main-2022-10-04-12-30-01.js","main-2022-10-04-23-30-01.js","main-2022-10-05-10-30-01.js","main-2022-10-05-21-30-01.js","main-2022-10-04-13-00-01.js","main-2022-10-05-00-00-01.js","main-2022-10-05-11-00-02.js","main-2022-10-05-22-00-01.js","main-2022-10-04-13-30-01.js","main-2022-10-05-00-30-01.js","main-2022-10-05-11-30-01.js","main-2022-10-07-21-51-59.js","main-2022-10-04-14-00-01.js","main-2022-10-05-01-00-01.js","main-2022-10-05-12-00-01.js","main-2022-10-07-22-23-10.js","main-2022-10-04-14-30-01.js","main-2022-10-05-01-30-02.js","main-2022-10-05-12-30-01.js","main-2022-10-07-22-23-38.js","main-2022-10-04-15-00-01.js","main-2022-10-05-02-00-01.js","main-2022-10-05-13-00-01.js","main-2022-10-07-23-17-33.js","main-2022-10-04-15-30-01.js","main-2022-10-05-02-30-01.js","main-2022-10-05-13-30-01.js","main-2022-10-07-23-30-01.js","main-2022-10-04-16-00-01.js","main-2022-10-05-03-00-02.js","main-2022-10-05-14-00-02.js","main-2022-10-07-23-30-30.js","main-2022-10-04-16-30-01.js","main-2022-10-05-03-30-01.js","main-2022-10-05-14-30-01.js","main-2022-10-07-23-30-35.js","main-2022-10-04-17-00-01.js","main-2022-10-05-04-00-01.js","main-2022-10-05-15-00-01.js","main-2022-10-08-00-00-01.js","main-2022-10-04-17-30-01.js","main-2022-10-05-04-30-01.js","main-2022-10-05-15-30-01.js","main-2022-10-04-18-00-01.js","main-2022-10-05-05-00-01.js","main-2022-10-05-16-00-01.js","main-2022-10-04-18-30-01.js","main-2022-10-05-05-30-01.js","main-2022-10-05-16-30-01.js"];
+    
+
+        for(let link of links){
+            try{
+            alert(await window.parent.extractKey(4,"http://10.0.0.203/dump/e4/"+link));
+            }catch(err){
+                alert(link + "failed");
+            }
+
+        }
+
+
+    }catch(err){
+        console.error(err);
+        alert("fmovies failed");
+    }
+
+
+    try{
+
+        let links = ["main-2022-10-04-08-16-37.js","main-2022-10-04-18-30-02.js","main-2022-10-05-05-00-03.js","main-2022-10-05-15-30-03.js","main-2022-10-04-08-30-03.js","main-2022-10-04-19-00-02.js","main-2022-10-05-05-30-02.js","main-2022-10-05-16-00-03.js","main-2022-10-04-09-00-03.js","main-2022-10-04-19-30-03.js","main-2022-10-05-06-00-03.js","main-2022-10-05-16-30-03.js","main-2022-10-04-09-30-02.js","main-2022-10-04-20-00-03.js","main-2022-10-05-06-30-03.js","main-2022-10-05-17-00-03.js","main-2022-10-04-10-00-03.js","main-2022-10-04-20-30-03.js","main-2022-10-05-07-00-03.js","main-2022-10-05-17-30-03.js","main-2022-10-04-10-30-03.js","main-2022-10-04-21-00-03.js","main-2022-10-05-07-30-03.js","main-2022-10-05-18-00-03.js","main-2022-10-04-11-00-03.js","main-2022-10-04-21-30-03.js","main-2022-10-05-08-00-03.js","main-2022-10-05-18-30-02.js","main-2022-10-04-11-30-03.js","main-2022-10-04-22-00-03.js","main-2022-10-05-08-30-03.js","main-2022-10-05-19-00-03.js","main-2022-10-04-12-00-03.js","main-2022-10-04-22-30-02.js","main-2022-10-05-09-00-02.js","main-2022-10-05-19-30-03.js","main-2022-10-04-12-30-03.js","main-2022-10-04-23-00-02.js","main-2022-10-05-09-30-02.js","main-2022-10-05-20-00-03.js","main-2022-10-04-13-00-03.js","main-2022-10-04-23-30-02.js","main-2022-10-05-10-00-03.js","main-2022-10-05-20-30-03.js","main-2022-10-04-13-30-03.js","main-2022-10-05-00-00-02.js","main-2022-10-05-10-30-03.js","main-2022-10-05-21-00-03.js","main-2022-10-04-14-00-03.js","main-2022-10-05-00-30-03.js","main-2022-10-05-11-00-04.js","main-2022-10-05-21-30-03.js","main-2022-10-04-14-30-02.js","main-2022-10-05-01-00-03.js","main-2022-10-05-11-30-04.js","main-2022-10-05-22-00-03.js","main-2022-10-04-15-00-02.js","main-2022-10-05-01-30-03.js","main-2022-10-05-12-00-02.js","main-2022-10-07-22-23-12.js","main-2022-10-04-15-30-02.js","main-2022-10-05-02-00-02.js","main-2022-10-05-12-30-02.js","main-2022-10-07-22-23-39.js","main-2022-10-04-16-00-02.js","main-2022-10-05-02-30-02.js","main-2022-10-05-13-00-02.js","main-2022-10-07-23-17-34.js","main-2022-10-04-16-30-03.js","main-2022-10-05-03-00-03.js","main-2022-10-05-13-30-03.js","main-2022-10-07-23-30-03.js","main-2022-10-04-17-00-03.js","main-2022-10-05-03-30-03.js","main-2022-10-05-14-00-03.js","main-2022-10-08-00-00-03.js","main-2022-10-04-17-30-03.js","main-2022-10-05-04-00-02.js","main-2022-10-05-14-30-02.js","main-2022-10-04-18-00-02.js","main-2022-10-05-04-30-03.js","main-2022-10-05-15-00-02.js"];
+        for(let link of links){
+            try{
+                alert(await window.parent.extractKey(4,"http://10.0.0.203/dump/e6/"+link));
+                
+            }catch(err){
+                alert(link + "failed");
+            }
+
+        }
+
+
+    }catch(err){
+        console.error(err);
+        alert("zoro failed");
+    }
+}
+if(localStorage.getItem("devmode") === "true"){
+    document.getElementById("testExtensions").style.display = "block";
+    document.getElementById("testKey").style.display = "block";
+    document.getElementById("testExtensions").onclick = function(){
+        testIt();
+    }
+    document.getElementById("testKey").onclick = function(){
+        testKey();
+    }
+}
+
+let isSnapSupported = CSS.supports('scroll-snap-align:start') && CSS.supports("scroll-snap-stop: always") && CSS.supports("scroll-snap-type: x mandatory") && localStorage.getItem("fancyHome") !=="true";
+
+
+if(isSnapSupported){
+    document.getElementById("custom_rooms").className = "snappedCustomRooms";
+}
 function resetOfflineQual() {
     let qual = [360, 480, 720, 1080];
     while (true) {
@@ -130,7 +267,12 @@ document.getElementById("activeRemove").onclick = function () {
 
 document.getElementById("doneRemove").onclick = function () {
     let downloadQueue = window.parent.returnDownloadQueue();
-    downloadQueue.removeDone(downloadQueue);
+    downloadQueue.removeDone(downloadQueue, true);
+}
+
+document.getElementById("errorRemove").onclick = function () {
+    let downloadQueue = window.parent.returnDownloadQueue();
+    downloadQueue.removeDone(downloadQueue, false);
 }
 
 if (config.chrome) {
@@ -141,7 +283,7 @@ if (config.chrome) {
 function addQueue(queue, queueDOM, downloadQueue, isDone) {
 
 
-    if (queue.length == 0) {
+    if (!isDone && queue.length == 0) {
         queueDOM.append(createElement(
             {
                 "style": {
@@ -168,6 +310,9 @@ function addQueue(queue, queueDOM, downloadQueue, isDone) {
 
 
         let temp3 = createElement({ "element": "div", "innerText": queue[i].message, "class": "queueMessage" });
+
+        let temp4Con = createElement({ "element": "div"});
+        
         let temp4 = createElement({
             "element": "div", "class": "episodesDownloaded", "attributes": {
                 "data-url": queue[i].data
@@ -176,12 +321,28 @@ function addQueue(queue, queueDOM, downloadQueue, isDone) {
 
         temp4.onclick = function () {
             if (isDone) {
-                downloadQueue.removeFromDoneQueue(this.getAttribute("data-url"));
+                downloadQueue.removeFromDoneQueue(this.getAttribute("data-url"),downloadQueue);
 
             } else {
-                downloadQueue.removeFromQueue(this.getAttribute("data-url"));
+                downloadQueue.removeFromQueue(this.getAttribute("data-url"), downloadQueue);
 
             }
+
+        }
+        temp4Con.append(temp4);
+
+        if (isDone && queue[i].errored === true) {
+            let temp6 = createElement({
+                "element": "div", "class": "episodesRetry", "attributes": {
+                    "data-url": queue[i].data
+                }
+            });
+
+            temp6.onclick = function () {
+                    downloadQueue.retryFromDoneQueue(this.getAttribute("data-url"), downloadQueue);
+            }
+
+            temp4Con.append(temp6);
 
         }
         let downloadPercent;
@@ -198,7 +359,7 @@ function addQueue(queue, queueDOM, downloadQueue, isDone) {
         let temp5 = createElement({ "element": "div", "innerHTML": `${queue[i].title} - ${queue[i].anime.name.trim()}` });
 
         temp.append(temp2);
-        temp.append(temp4);
+        temp.append(temp4Con);
         temp2.append(temp5);
 
         if (!isDone && i === 0) {
@@ -208,14 +369,52 @@ function addQueue(queue, queueDOM, downloadQueue, isDone) {
 
 
         temp2.append(temp3);
-        queueDOM.append(temp);
+        if(isDone){
+            if(queue[i].errored === true){
+                errDOM.prepend(temp);
+            }else{
+                queueDOM.prepend(temp);
+            }            
+        }else{
+            queueDOM.append(temp);
+        }
     }
+
+    errDOM.children.length == 0 ? errDOM.append(createElement(
+        {
+            "style": {
+                "color": "white",
+                "fontSize": "15px",
+                "margin": "10px 0 30px 0",
+            },
+            "innerText": "Empty"
+        }
+    )) : null;
+
+
+    queueDOM.children.length == 0 ? queueDOM.append(createElement(
+        {
+            "style": {
+                "color": "white",
+                "fontSize": "15px",
+                "margin": "10px 0 30px 0",
+            },
+            "innerText": "Empty"
+        }
+    )) : null;
 }
 
 
 
 function reloadQueue(mode = 0) {
     let downloadQueue = window.parent.returnDownloadQueue();
+    if(downloadQueue.pause){
+        document.getElementById("queueButton").className = "queuePlay";
+        document.getElementById("queueButton").setAttribute("data-paused", "true");
+    }else{
+        document.getElementById("queueButton").className = "queuePause";
+        document.getElementById("queueButton").setAttribute("data-paused", "false");
+    }
 
     if (mode == 0 || mode == 1) {
         let queueDOM = document.getElementById("activeCon");
@@ -228,6 +427,7 @@ function reloadQueue(mode = 0) {
     if (mode == 0 || mode == 2) {
         let doneQueueDOM = document.getElementById("doneCon");
         doneQueueDOM.innerHTML = "";
+        errDOM.innerHTML = "";
         let doneQueue = downloadQueue.doneQueue;
         addQueue(doneQueue, doneQueueDOM, downloadQueue, true);
     }
@@ -265,6 +465,7 @@ if (localStorage.getItem("offline") === 'true') {
 }
 
 document.getElementById("resetSource").onclick = function () {
+    const extensionNames = window.parent.returnExtensionNames();
     let message = `What extension's source do you want to reset?\n`;
     for (let i = 0; i < extensionNames.length; i++) {
         message += `${i}. ${extensionNames[i]}\n`;
@@ -386,23 +587,59 @@ document.getElementById("outlineColor").onchange = function () {
 }
 
 
-document.getElementById("outlineWidth").onchange = function () {
+document.getElementById("outlineWidth").oninput = function () {
     localStorage.setItem("outlineWidth", this.value);
+}
+
+document.getElementById("fmoviesBase").oninput = function () {
+    localStorage.setItem("fmoviesBaseURL", this.value);
+    window.parent.setFmoviesBase(); 
 }
 
 document.getElementById("themeColor").onchange = function () {
     localStorage.setItem("themecolor", this.value);
 }
 
+document.getElementById("downloadTimeout").oninput = function () {
+    localStorage.setItem("downloadTimeout", this.value);
+}
+
 document.getElementById("scrollBool").onchange = function () {
     localStorage.setItem("scrollBool", this.checked.toString());
 }
 
+document.getElementById("autoPause").onchange = function () {
+    localStorage.setItem("autoPause", this.checked.toString());
+}
+
+
+document.getElementById("hideNotification").onchange = function () {
+    localStorage.setItem("hideNotification", this.checked.toString());
+}
+
+document.getElementById("fancyHome").onchange = function () {
+    localStorage.setItem("fancyHome", this.checked.toString());
+    location.reload();
+}
+
+document.getElementById("alwaysDown").onchange = function () {
+    localStorage.setItem("alwaysDown", this.checked.toString());
+}
+
+
+
+
 
 document.getElementById("outlineColor").value = localStorage.getItem("outlineColor");
 document.getElementById("outlineWidth").value = localStorage.getItem("outlineWidth");
+document.getElementById("fmoviesBase").value = localStorage.getItem("fmoviesBaseURL");
 document.getElementById("themeColor").value = localStorage.getItem("themecolor");
+document.getElementById("downloadTimeout").value = localStorage.getItem("downloadTimeout");
 document.getElementById("scrollBool").checked = localStorage.getItem("scrollBool") !== "false";
+document.getElementById("autoPause").checked = localStorage.getItem("autoPause") === "true";
+document.getElementById("hideNotification").checked = localStorage.getItem("hideNotification") === "true";
+document.getElementById("fancyHome").checked = localStorage.getItem("fancyHome") === "true";
+document.getElementById("alwaysDown").checked = localStorage.getItem("alwaysDown") === "true";
 
 
 
@@ -470,6 +707,9 @@ window.onmessage = function (x) {
             reloadQueue(1);
         } else if (x.data.action == "doneUpdate") {
             reloadQueue(2);
+        }else if (x.data.action == "paused") {
+            document.getElementById("queueButton").className = "queuePlay";
+            document.getElementById("queueButton").setAttribute("data-paused", "true");
         }
         else if (x.data.action == "percentageUpate") {
             if (document.getElementById("downloadingPercent")) {
@@ -711,7 +951,40 @@ function updateRoomAdd() {
 
 
 }
+if(isSnapSupported){
+    let scrollLastIndex;
+    let tempCatDOM = document.getElementsByClassName("categories");
+    let cusRoomDOM = document.getElementById("custom_rooms");
+    cusRoomDOM.addEventListener("scroll", function(){
+        let unRoundedIndex = cusRoomDOM.scrollLeft / cusRoomDOM.offsetWidth;
+        let index = Math.round(unRoundedIndex);
 
+        if(index != scrollLastIndex){
+            for (let i = 0; i < tempCatDOM.length; i++) {
+                if (i == index) {
+                    tempCatDOM[i].classList.add("activeCat");
+                    tempCatDOM[i].scrollIntoView();
+                    localStorage.setItem("currentCategory",tempCatDOM[i].getAttribute("data-id"));
+                } else {
+                    tempCatDOM[i].classList.remove("activeCat");
+                }
+            }
+
+            let activeCatDOM = document.querySelector(".categories.activeCat");
+            let temp = document.getElementById("catActiveMain");
+            window.requestAnimationFrame(function () {
+                window.requestAnimationFrame(function () {
+                    if (temp && activeCatDOM) {
+                        temp.style.left = activeCatDOM.offsetLeft;
+                        temp.style.height = activeCatDOM.offsetHeight;
+                        temp.style.width = activeCatDOM.offsetWidth;
+                    }
+                });
+            });
+        }
+        scrollLastIndex = index;
+    }, {"passive" : true});
+}
 function addCustomRoom() {
 
     rooms2 = rooms.slice(0);
@@ -734,16 +1007,15 @@ function addCustomRoom() {
                     let thisDataId = this.getAttribute("data-id");
                     localStorage.setItem("currentCategory", thisDataId);
 
-
-                    let tempCat = document.getElementsByClassName("categories");
-                    for (let i = 0; i < tempCat.length; i++) {
-                        if (this == tempCat[i]) {
-                            tempCat[i].classList.add("activeCat");
-                        } else {
-                            tempCat[i].classList.remove("activeCat");
+                    if(!isSnapSupported){
+                        let tempCat = document.getElementsByClassName("categories");
+                        for (let i = 0; i < tempCat.length; i++) {
+                            if (this == tempCat[i]) {
+                                tempCat[i].classList.add("activeCat");
+                            } else {
+                                tempCat[i].classList.remove("activeCat");
+                            }
                         }
-
-
                     }
 
 
@@ -757,19 +1029,36 @@ function addCustomRoom() {
                                 temp.style.width = activeCatDOM.offsetWidth;
                             }
 
-                            setTimeout(function () {
+                            if(isSnapSupported){
                                 let tempCatData = document.getElementsByClassName("categoriesDataMain");
                                 for (let i = 0; i < tempCatData.length; i++) {
                                     if (tempCatData[i].id == thisDataId) {
                                         tempCatData[i].classList.add("active");
-
+                                        window.requestAnimationFrame(function () {
+                                            window.requestAnimationFrame(function () {
+                                                document.getElementById("custom_rooms").scrollTo(tempCatData[i].offsetLeft,0);
+                                            });
+                                        });
+                                        
                                     } else {
                                         tempCatData[i].classList.remove("active");
 
                                     }
                                 }
-                            }, 200);
+                            }else{
+                                setTimeout(function () {
+                                    let tempCatData = document.getElementsByClassName("categoriesDataMain");
+                                    for (let i = 0; i < tempCatData.length; i++) {
+                                        if (tempCatData[i].id == thisDataId) {
+                                            tempCatData[i].classList.add("active");
 
+                                        } else {
+                                            tempCatData[i].classList.remove("active");
+
+                                        }
+                                    }
+                                }, 200);
+                            }
                         });
                     });
 
@@ -784,7 +1073,7 @@ function addCustomRoom() {
 
 
     document.getElementById("custom_rooms").append(createElement({
-        "class": `categoriesDataMain${(localStorage.getItem("currentCategory") === "room_recently") ? " active" : ""}`,
+        "class": `categoriesDataMain${(localStorage.getItem("currentCategory") === "room_recently") ? " active" : ""}${(isSnapSupported) ? " snappedCategoriesDataMain" : ""}`,
         "id": `room_recently`
     }));
 
@@ -795,7 +1084,7 @@ function addCustomRoom() {
 
             let roomID = `room_${rooms2[yye]}`;
             let tempDiv = createElement({
-                "class": `categoriesDataMain${(localStorage.getItem("currentCategory") === roomID) ? " active" : ""}`,
+                "class": `categoriesDataMain${(localStorage.getItem("currentCategory") === roomID) ? " active" : ""}${(isSnapSupported) ? " snappedCategoriesDataMain" : ""}`,
                 "id": roomID
             });
 
@@ -820,7 +1109,7 @@ function addCustomRoom() {
 
         let roomID = `room_${rooms2[i + 1]}`;
         let tempDiv = createElement({
-            "class": `categoriesDataMain${(localStorage.getItem("currentCategory") === roomID) ? " active" : ""}`,
+            "class": `categoriesDataMain${(localStorage.getItem("currentCategory") === roomID) ? " active" : ""}${(isSnapSupported) ? " snappedCategoriesDataMain" : ""}`,
             "id": roomID
         });
 
@@ -845,6 +1134,7 @@ function addCustomRoom() {
         let temp = document.getElementById("catActiveMain");
         window.requestAnimationFrame(function () {
             if (temp && activeCatDOM) {
+                activeCatDOM.click();
                 temp.style.left = activeCatDOM.offsetLeft;
                 temp.style.height = activeCatDOM.offsetHeight;
                 temp.style.width = activeCatDOM.offsetWidth;
@@ -1093,11 +1383,16 @@ if (true) {
         x.parentElement.parentElement.parentElement.remove();
     }
 
-    function get_userinfo_callback(x, y, z) {
+    async function get_userinfo_callback(x, y, z) {
 
 
         document.getElementById("room_dis_child").innerHTML = "";
         document.getElementById("room_add_child").innerHTML = "";
+        let offlineMode = localStorage.getItem("offline") === "true";
+
+        if(offlineMode){
+            await populateDownloadedArray();
+        }
         let a = x.data;
 
         rooms = a[1].slice(0);
@@ -1126,6 +1421,12 @@ if (true) {
         for (var i = 0; i < data.length; i++) {
             let domToAppend;
 
+            if(offlineMode){
+                if(data[i][0] in downloadedFolders){
+                    delete downloadedFolders[data[i][0]];
+                }
+            }
+
             if (document.getElementById(`room_${data[i][4]}`)) {
                 domToAppend = document.getElementById(`room_${data[i][4]}`);
             } else {
@@ -1144,6 +1445,9 @@ if (true) {
             tempDiv3.textContent = fix_title(data[i][0]);
             tempDiv3.setAttribute("data-href", data[i][5]);
             tempDiv3.setAttribute("data-current", data[i][3]);
+            tempDiv3.setAttribute("data-mainname", data[i][0]);
+
+            
 
             tempDiv3.onclick = function () {
                 localStorage.setItem("currentLink", this.getAttribute("data-current"));
@@ -1165,9 +1469,11 @@ if (true) {
 
             let tempDiv6 = createElement({
                 "class": "s_card_play", "attributes": {
-                    "data-href": data[i][3]
+                    "data-href": data[i][3],
+                    "data-mainname": data[i][0]
                 }, "listeners": {
                     "click": function () {
+                        localStorage.setItem("mainName", this.getAttribute("data-mainname"));
                         window.parent.postMessage({ "action": 4, "data": this.getAttribute("data-href") }, "*");
                     }
                 }, "element": "div"
@@ -1232,8 +1538,10 @@ if (true) {
 
         }
 
+        pullTabArray = [];
         let catMainDOM = document.getElementsByClassName("categoriesDataMain");
         for (var i = 0; i < catMainDOM.length; i++) {
+            pullTabArray.push(new pullToRefresh(catMainDOM[i]));
             catMainDOM[i].append(createElement({
                 "style": {
                     "width": "100%",
@@ -1251,7 +1559,64 @@ if (true) {
             }
         }
 
+        if(offlineMode){
+            for(let showname in downloadedFolders){
+                if(showname == "socialsharing-downloads"){
+                    continue;
+                }
 
+                let domToAppend = document.getElementById('room_recently');
+
+                let tempDiv = createElement({ "class": "s_card", "attributes": {}, "listeners": {} });
+                tempDiv.style.backgroundImage = `url("../../assets/images/placeholder.jpg")`;
+
+                let tempDiv1 = createElement({ "class": "s_card_bg", "attributes": {}, "listeners": {} });
+                let tempDiv2 = createElement({ "class": "s_card_title", "attributes": {}, "listeners": {} });
+
+
+                let tempDiv3 = document.createElement("div");
+                tempDiv3.className = "s_card_title_main";
+                tempDiv3.textContent = fix_title(showname);
+                tempDiv3.setAttribute("data-href", "?watch=/"+ showname);
+
+                let tempDiv7 = createElement({ "class": "card_menu", "attributes": {}, "listeners": {} });
+
+                let tempDiv9 = createElement({
+                    "class": "card_menu_item card_menu_icon_delete", "attributes": {
+                    "data-showname": showname
+                    }, 
+                    "listeners": {
+                        "click": async function () {
+                            try{
+                                await window.parent.removeDirectory(`${showname}`);
+                                tempDiv.remove();
+                            }catch(err){
+                                alert("Could not delete the files. You have to manually delete it by going to the show's page.");
+                            }
+                        }
+                    }
+                });
+
+                tempDiv3.onclick = function () {
+                    window.parent.postMessage({ "action": 500, data: "pages/episode/index.html" + this.getAttribute("data-href") }, "*");
+
+                };
+
+               
+
+
+                tempDiv2.append(tempDiv3);
+
+                tempDiv1.append(tempDiv2);
+                tempDiv7.append(tempDiv9);
+                
+                tempDiv1.append(tempDiv7);
+
+                tempDiv.append(tempDiv1);
+
+                domToAppend.append(tempDiv);
+            }
+        }
 
 
     }
@@ -1303,16 +1668,7 @@ if (true) {
 
 
 
-function applyTheme() {
-    var themeColorL = localStorage.getItem("themecolor");
-    if (themeColorL && themeColorL != undefined && themeColorL != null) {
-        document.documentElement.style.setProperty('--theme-color', themeColorL);
-    } else {
-        document.documentElement.style.setProperty('--theme-color', "#4b4bc2");
 
-    }
-
-}
 
 function changeEngine() {
     let val = localStorage.getItem("currentEngine");
@@ -1325,15 +1681,5 @@ function changeEngine() {
     }
 }
 
-function changeTheme() {
-    let promptT = prompt("Enter the theme color", "#4b4bc2");
-    if (promptT.trim() != "" && promptT != null && promptT != undefined) {
-        localStorage.setItem("themecolor", promptT);
-        window.parent.postMessage({ "action": 402 }, "*");
-        applyTheme();
-    } else {
 
-    }
-}
-
-// applyTheme();
+applyTheme();

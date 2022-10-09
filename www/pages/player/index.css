@@ -64,7 +64,7 @@ div {
     position: relative;
     border-radius: 100%;
     transform: translate(-10px, -7.5px);
-    background-color: #B22222;
+    background-color: var(--theme-color);
     pointer-events: none;
     z-index: 9;
 }
@@ -187,7 +187,7 @@ div {
 
 #loaded {
     height: 100%;
-    background-color: #B22222;
+    background-color: var(--theme-color);
     width: 0px;
     position: absolute;
     left: 0;
@@ -199,8 +199,18 @@ div {
     z-index: 7;
     height: 100%;
     position: absolute;
-    background-color: #ff9999;
+    background-color: var(--theme-color);
     top: 0;
+}
+
+#buffered::after{
+    content: "";
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(255,255,255,0.6);
 }
 
 #lock {
@@ -595,6 +605,10 @@ input:checked+.slider:before {
 
 .bottomMargin{
     margin: 20px;
+    background: black;
+    padding: 15px;
+    display: inline-block;
+    border-radius: 10px;
 }
 
 select{
@@ -623,7 +637,8 @@ select{
     color: white;
     outline: none;
     background: white;
-    height: 1.3px;
+    height: 0px;
+    display: none;
 }
 
 #gestureBar{

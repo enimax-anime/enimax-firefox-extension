@@ -61,3 +61,24 @@ try{
 }catch(err){
 
 }
+
+function applyTheme() {
+    var themeColorL = localStorage.getItem("themecolor");
+    if (themeColorL && themeColorL != undefined && themeColorL != null) {
+        document.documentElement.style.setProperty('--theme-color', themeColorL);
+    } else {
+        document.documentElement.style.setProperty('--theme-color', "#4b4bc2");
+
+    }
+
+}
+
+function changeTheme() {
+    let promptT = prompt("Enter the theme color", "#4b4bc2");
+    if (promptT.trim() != "" && promptT != null && promptT != undefined) {
+        localStorage.setItem("themecolor", promptT);
+        applyTheme()
+    } else {
+
+    }
+}

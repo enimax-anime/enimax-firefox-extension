@@ -1,4 +1,6 @@
 var offlineDB;
+let db;
+let downloadedSqlite;
 offlineDB = new Dexie("database");
 offlineDB.version(1.3).stores({
     vid: "++id,cur_time, ep, name,time1,time2,image,curlink,main_link,times,comp",
@@ -25,7 +27,7 @@ let initQueries = [
 
 async function batchInsert(command) {
     return new Promise(function (resolve, reject) {
-        db.sqlBatch(command, function () {
+        downloadedSqlite.sqlBatch(command, function () {
             resolve("Done!");
         }, function (error) {
             reject(error);
@@ -41,7 +43,7 @@ async function dexieToSQLite() {
 
     try{
 
-        let currentDB = await offlineDB.vid.toArray();
+        let currentDB = await downloadedDB.vid.toArray();
         let command = [
             initQueries[2]
                 
@@ -65,7 +67,6 @@ async function dexieToSQLite() {
                 fieldNames = fieldNames.join(",");
                 questionMarks = questionMarks.join(",");
                 command.push([`INSERT INTO video (${fieldNames}) VALUES (${questionMarks})`, fieldValues]);
-                console.log(command);
 
             }
         }
@@ -76,7 +77,7 @@ async function dexieToSQLite() {
 
 
 
-        currentDB = await offlineDB.playlist.toArray();
+        currentDB = await downloadedDB.playlist.toArray();
         command = [
             initQueries[0]
                 
@@ -100,7 +101,6 @@ async function dexieToSQLite() {
                 fieldNames = fieldNames.join(",");
                 questionMarks = questionMarks.join(",");
                 command.push([`INSERT INTO playlist (${fieldNames}) VALUES (${questionMarks})`, fieldValues]);
-                console.log(command);
 
             }
         }
@@ -110,7 +110,7 @@ async function dexieToSQLite() {
         alert("Done! You can now safely reload the page.");
         window.location.reload();
     }catch(err){
-        console.log(err);
+        console.error(err);
         alert("Some unexpected error has occurred. Contact the developer.");
     }
 
@@ -118,7 +118,6 @@ async function dexieToSQLite() {
    
 }
 
-let db;
 
 function getDB(){
     return db;
@@ -130,21 +129,28 @@ async function SQLInit() {
         location: 'default',
     });
 
+    for (let i = 0; i < initQueries.length; i++) {
+        try {
+            let temp = await mysql_query(initQueries[i], [], db);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+}
 
-
-
+async function SQLInitDownloaded() {
+    downloadedSqlite = window.parent.sqlitePlugin.openDatabase({
+        name: 'downloaded.db',
+        location: 'default',
+    });
 
     for (let i = 0; i < initQueries.length; i++) {
         try {
-            let temp = await mysql_query(initQueries[i], []);
-            console.log(temp);
+            let temp = await mysql_query(initQueries[i], [], downloadedSqlite);
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
-
-
-
 }
 
 
@@ -153,11 +159,11 @@ async function SQLInit() {
 
 
 
-async function mysql_query(command, inputs, lastID = false) {
+async function mysql_query(command, inputs, currentDB, lastID = false) {
 
     return new Promise(function (resolve, reject) {
         try {
-            db.transaction(function (tx) {
+            currentDB.transaction(function (tx) {
                 tx.executeSql(command, inputs, function (tx, rs) {
 
                     try{
@@ -275,7 +281,7 @@ function makeRequest(method, url, form, timeout) {
                 reject(x.message);
             }
         }).catch(function (error) {
-            console.log(error);
+            console.error(error);
             reject(error);
         });
     });
@@ -286,7 +292,8 @@ async function apiCall(method, form, callback, args = [], timeout = false) {
         let url = `${config.remote}/api`;
         let response;
         if (localStorage.getItem("offline") === 'true') {
-            response = await actionDexie[form.action]({ "body": form }, false);
+            response = await actionSQLite[form.action]({ "body": form }, true);
+
         }
         else if (config.local) {
             if(config.chrome){
@@ -322,7 +329,12 @@ if (true) {
 
 
 
-    async function updateTime(req) {
+    async function updateTime(req, isDownloaded) {
+        let currentDB = db;
+        if(isDownloaded){
+            currentDB = downloadedSqlite;
+        }
+
         try {
 
             if ("time" in req.body && "name" in req.body && "ep" in req.body) {
@@ -332,20 +344,20 @@ if (true) {
 
 
 
-                var getcount = await mysql_query("SELECT count(*) as count from video where ep=? and name=?", [ep, name]);
+                var getcount = await mysql_query("SELECT count(*) as count from video where ep=? and name=?", [ep, name], currentDB);
 
                 if (getcount[0].count >= 1) {
 
-                    var update = await mysql_query("UPDATE video set cur_time=?,time2=?, times=times+1 where ep=? and name=?", [cur, timern(), ep, name]);
+                    var update = await mysql_query("UPDATE video set cur_time=?,time2=?, times=times+1 where ep=? and name=?", [cur, timern(), ep, name], currentDB);
 
-                    var update = await mysql_query("UPDATE video set time2=? where ep=0 and name=?", [timern(), name]);
+                    var update = await mysql_query("UPDATE video set time2=? where ep=0 and name=?", [timern(), name], currentDB);
 
 
 
 
                 } else {
 
-                    var insert = await mysql_query("INSERT INTO video (ep,cur_time,name,time2) VALUES (?,?,?,?,?)", [ep, cur, name, timern()]);
+                    var insert = await mysql_query("INSERT INTO video (ep,cur_time,name,time2) VALUES (?,?,?,?,?)", [ep, cur, name, timern()], currentDB);
 
 
 
@@ -364,7 +376,7 @@ if (true) {
             }
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return { "status": 500, "errorCode": 10000, "message": "Database error." };
         }
 
@@ -376,7 +388,12 @@ if (true) {
     }
 
 
-    async function getShowInfo(req) {
+    async function getShowInfo(req, isDownloaded) {
+        let currentDB = db;
+        if(isDownloaded){
+            currentDB = downloadedSqlite;
+        }
+
         try {
 
             if ("cur" in req.body && "name" in req.body && "ep" in req.body) {
@@ -397,12 +414,12 @@ if (true) {
 
 
                     var response = {};
-                    var getdata = await mysql_query("SELECT cur_time as current, main_link as mainLink from video where ep=0 and name=? LIMIT 1", [nameUm]);
+                    var getdata = await mysql_query("SELECT cur_time as current, main_link as mainLink from video where ep=0 and name=? LIMIT 1", [nameUm],currentDB);
 
                     if (getdata.length == 0) {
 
 
-                        await mysql_query("INSERT INTO video (ep,cur_time,name,curlink,time2) VALUES (0,?,?,?,?)", [ep, nameUm, cur, timern()]);
+                        await mysql_query("INSERT INTO video (ep,cur_time,name,curlink,time2) VALUES (0,?,?,?,?)", [ep, nameUm, cur, timern()], currentDB);
 
 
 
@@ -411,20 +428,20 @@ if (true) {
                     }
 
 
-                    await mysql_query("UPDATE video set cur_time=?,curlink=?,time2=? where name=? and ep=0", [ep, cur, timern(), nameUm]);
+                    await mysql_query("UPDATE video set cur_time=?,curlink=?,time2=? where name=? and ep=0", [ep, cur, timern(), nameUm], currentDB);
 
 
 
 
 
-                    var getdata = await mysql_query("SELECT cur_time as curtime from video where ep=? and name=? LIMIT 1", [ep, name]);
+                    var getdata = await mysql_query("SELECT cur_time as curtime from video where ep=? and name=? LIMIT 1", [ep, name], currentDB);
 
 
                     if (getdata.length != 0) {
                         response.time = getdata[0].curtime;
                     } else {
                         response.time = 0;
-                        await mysql_query("INSERT INTO video (ep,cur_time,name) VALUES (?,?,?)", [ep, 0, name]);
+                        await mysql_query("INSERT INTO video (ep,cur_time,name) VALUES (?,?,?)", [ep, 0, name], currentDB);
 
                     }
 
@@ -445,7 +462,7 @@ if (true) {
             }
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
 
             return { "status": 500, "errorCode": 10000, "message": "Database error." };
         }
@@ -453,7 +470,11 @@ if (true) {
     }
 
 
-    async function getUserInfo(req) {
+    async function getUserInfo(req, isDownloaded) {
+        let currentDB = db;
+        if(isDownloaded){
+            currentDB = downloadedSqlite;
+        }
         try {
 
             if (true) {
@@ -466,7 +487,7 @@ if (true) {
                     []
                 ];
 
-                var getData = await mysql_query("SELECT DISTINCT(name) as b,cur_time as a,image,time2,curlink,comp,main_link from video where ep=0  and curlink IS NOT NULL ORDER BY time2 DESC", []);
+                var getData = await mysql_query("SELECT DISTINCT(name) as b,cur_time as a,image,time2,curlink,comp,main_link from video where ep=0  and curlink IS NOT NULL ORDER BY time2 DESC", [], currentDB);
 
 
 
@@ -481,7 +502,7 @@ if (true) {
 
 
 
-                var getData = await mysql_query("SELECT id,room_name FROM playlist", []);
+                var getData = await mysql_query("SELECT id,room_name FROM playlist", [], currentDB);
 
 
 
@@ -494,7 +515,7 @@ if (true) {
                 }
 
 
-                var getData = await mysql_query("SELECT order1 FROM playlistOrder LIMIT 1", []);
+                var getData = await mysql_query("SELECT order1 FROM playlistOrder LIMIT 1", [], currentDB);
 
 
 
@@ -519,7 +540,7 @@ if (true) {
             }
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return { "status": 500, "errorCode": 10000, "message": "Database error." };
         }
 
@@ -527,7 +548,11 @@ if (true) {
 
 
 
-    async function updateImage(req) {
+    async function updateImage(req, isDownloaded) {
+        let currentDB = db;
+        if(isDownloaded){
+            currentDB = downloadedSqlite;
+        }
         try {
 
             if ("img" in req.body && "name" in req.body) {
@@ -545,11 +570,11 @@ if (true) {
                 var response = {};
                 if (img.toLowerCase().indexOf("javascript") == -1 && main_link.toLowerCase().indexOf("javascript") == -1 && main_link.toLowerCase().substring(0, 7) == "?watch=") {
 
-                    var getData = await mysql_query("SELECT image from video where ep=0 and name=? LIMIT 1", [name]);
+                    var getData = await mysql_query("SELECT image from video where ep=0 and name=? LIMIT 1", [name], currentDB);
 
                     if (getData.length == 0) {
 
-                        await mysql_query("INSERT INTO video (ep,cur_time,name,image,main_link) VALUES (0,1,?,?,?)", [name, img, main_link]);
+                        await mysql_query("INSERT INTO video (ep,cur_time,name,image,main_link) VALUES (0,1,?,?,?)", [name, img, main_link], currentDB);
 
 
 
@@ -577,7 +602,11 @@ if (true) {
 
 
 
-    async function deleteShow(req) {
+    async function deleteShow(req, isDownloaded) {
+        let currentDB = db;
+        if(isDownloaded){
+            currentDB = downloadedSqlite;
+        }
         try {
 
             if ("name" in req.body) {
@@ -586,7 +615,14 @@ if (true) {
 
                 var response = {};
 
-                await mysql_query("DELETE FROM video where ep=0 and name=?", [name]);
+                if (isDownloaded) {
+                    try{
+                        await window.parent.removeDirectory(`${name}`);
+                    }catch(err){
+                        alert("Could not delete the files. You have to manually delete it by going to the show's page.");
+                    }
+                }
+                await mysql_query("DELETE FROM video where ep=0 and name=?", [name], currentDB);
 
 
 
@@ -607,7 +643,11 @@ if (true) {
     }
 
 
-    async function changeState(req) {
+    async function changeState(req, isDownloaded) {
+        let currentDB = db;
+        if(isDownloaded){
+            currentDB = downloadedSqlite;
+        }
         try {
 
             if ("state" in req.body && "name" in req.body && !isNaN(parseInt(req.body.state))) {
@@ -616,7 +656,7 @@ if (true) {
 
 
 
-                await mysql_query("UPDATE video SET comp=? where ep=0 and name=?", [state, name]);
+                await mysql_query("UPDATE video SET comp=? where ep=0 and name=?", [state, name], currentDB);
 
 
 
@@ -643,7 +683,11 @@ if (true) {
     }
 
 
-    async function updateImageManual(req) {
+    async function updateImageManual(req, isDownloaded) {
+        let currentDB = db;
+        if(isDownloaded){
+            currentDB = downloadedSqlite;
+        }
         try {
 
             if ("img" in req.body && "name" in req.body) {
@@ -653,7 +697,7 @@ if (true) {
 
                 if (img.toLowerCase().indexOf("javascript") == -1) {
 
-                    await mysql_query("UPDATE video set image=? where name=? and ep=0", [img, name]);
+                    await mysql_query("UPDATE video set image=? where name=? and ep=0", [img, name], currentDB);
 
                     response.image = img;
 
@@ -682,13 +726,17 @@ if (true) {
     }
 
 
-    async function addRoom(req) {
+    async function addRoom(req, isDownloaded) {
+        let currentDB = db;
+        if(isDownloaded){
+            currentDB = downloadedSqlite;
+        }
         try {
 
             if ("room" in req.body) {
                 var room_name = req.body.room;
 
-                let getData = await mysql_query("INSERT INTO playlist (room_name) VALUES (?)", [room_name], true);
+                let getData = await mysql_query("INSERT INTO playlist (room_name) VALUES (?)", [room_name], currentDB, true);
 
 
 
@@ -707,7 +755,7 @@ if (true) {
             }
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return { "status": 500, "errorCode": 10000, "message": "Database error." };
         }
 
@@ -715,13 +763,17 @@ if (true) {
 
 
 
-    async function deleteRoom(req) {
+    async function deleteRoom(req, isDownloaded) {
+        let currentDB = db;
+        if(isDownloaded){
+            currentDB = downloadedSqlite;
+        }
         try {
 
             if ("id" in req.body && !isNaN(parseInt(req.body.id))) {
                 var id_room = parseInt(req.body.id);
 
-                await mysql_query("DELETE FROM playlist where id=?", [id_room]);
+                await mysql_query("DELETE FROM playlist where id=?", [id_room], currentDB);
 
                 var response = {};
 
@@ -745,7 +797,11 @@ if (true) {
     }
 
 
-    async function changeOrder(req) {
+    async function changeOrder(req, isDownloaded) {
+        let currentDB = db;
+        if(isDownloaded){
+            currentDB = downloadedSqlite;
+        }
         try {
 
             if ("order" in req.body) {
@@ -764,7 +820,7 @@ if (true) {
 
                 if (check == 0) {
 
-                    await mysql_query("INSERT INTO playlistOrder (id,order1) VALUES (?,?) ON CONFLICT(id) DO UPDATE SET order1=?", ["0", req.body.order, req.body.order]);
+                    await mysql_query("INSERT INTO playlistOrder (id,order1) VALUES (?,?) ON CONFLICT(id) DO UPDATE SET order1=?", ["0", req.body.order, req.body.order], currentDB);
 
 
 
@@ -783,14 +839,18 @@ if (true) {
             }
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return { "status": 500, "errorCode": 10000, "message": "Database error." };
         }
 
     }
 
 
-    async function changeMainLink(req) {
+    async function changeMainLink(req, isDownloaded) {
+        let currentDB = db;
+        if(isDownloaded){
+            currentDB = downloadedSqlite;
+        }
         try {
 
             if ("url" in req.body && "name" in req.body) {
@@ -803,7 +863,7 @@ if (true) {
                 var response = {};
                 if (main_link.toLowerCase().indexOf("javascript") == -1 && main_link.toLowerCase().substring(0, 7) == "?watch=") {
 
-                    await mysql_query("UPDATE video set main_link=? where name=? and ep=0", [main_link, name]);
+                    await mysql_query("UPDATE video set main_link=? where name=? and ep=0", [main_link, name], currentDB);
 
 
                     response.url = main_link;
@@ -823,7 +883,7 @@ if (true) {
             }
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return { "status": 500, "errorCode": 10000, "message": "Database error." };
         }
 
@@ -920,7 +980,7 @@ if(true){
         }
 
         try {
-            console.log(req.body);
+            console.error(req.body);
             if ("cur" in req.body && "name" in req.body && "ep" in req.body) {
                 var cur = req.body.cur;
                 var name = req.body.name;
@@ -1001,7 +1061,7 @@ if(true){
             }
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return { "status": 500, "errorCode": 10000, "message": "Database error." };
         }
 
@@ -1090,7 +1150,7 @@ if(true){
 
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return { "status": 500, "errorCode": 10000, "message": "Database error." };
         }
 
@@ -1407,7 +1467,7 @@ if(true){
             }
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return { "status": 500, "errorCode": 10000, "message": "Database error." };
         }
 
@@ -1455,7 +1515,7 @@ if(true){
             }
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return { "status": 500, "errorCode": 10000, "message": "Database error." };
         }
 
