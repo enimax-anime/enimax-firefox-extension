@@ -2178,7 +2178,7 @@ document.querySelector("#repForward").onclick = function () {
 let socketCalledIni = false;
 
 
-if (location.search.includes("engine=3")) {
+if (location.search.includes("engine=3") && config.sockets) {
 	if (!config.chrome) {
 		CustomXMLHttpRequest = XMLHttpRequest2;
 	}
