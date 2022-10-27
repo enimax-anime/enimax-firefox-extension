@@ -24,7 +24,7 @@ function extractKey(id, url = null) {
             scr = (await MakeFetch(url));
         }
         
-        scr = extractKeyComp(4,scr);
+        scr = extractKeyComp(id,scr);
         if(scr[1]){
             resolve(scr[0]);
         }else{
@@ -93,10 +93,13 @@ if (config && config.chrome) {
                 "value": extensionList[3].config.referer
             });
 
-            details.requestHeaders.push({
-                "name": "sid",
-                "value": localStorage.getItem("sid")
-            });
+            if(config.sockets){
+                details.requestHeaders.push({
+                    "name": "sid",
+                    "value": localStorage.getItem("sid")
+                });
+            }
+            
 
 
 
@@ -1329,7 +1332,7 @@ const extensionNames = ["WCOforever", "Animixplay", "Fmovies", "Zoro"];
 
 
 
-localStorage.setItem("version", "1.1.9");
+localStorage.setItem("version", "1.2.0");
 if (localStorage.getItem("lastUpdate") === null) {
     localStorage.setItem("lastUpdate", "0");
 

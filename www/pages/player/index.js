@@ -85,6 +85,8 @@ let downloaded = localStorage.getItem("offline") === 'true';
 if (downloaded) {
 	CustomXMLHttpRequest = window.parent.XMLHttpRequest;
 }
+let tempConfig = config;
+
 class XMLHttpRequest2 {
 	constructor() {
 		this.headers = {};
@@ -95,8 +97,11 @@ class XMLHttpRequest2 {
 		this.requestHeaders = {
 			"origin": extensionList[3].config.origin,
 			"referer": extensionList[3].config.referer,
-			"sid": sid,
 		};
+		
+		if(tempConfig.sockets){
+			this.requestHeaders["sid"] = sid;
+		}
 		this.responseHeaders = {};
 		this.listeners = {};
 		this.readyState = 0;

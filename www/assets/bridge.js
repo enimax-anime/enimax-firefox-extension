@@ -961,6 +961,7 @@ window.addEventListener('message', function (x) {
         }else{
             currentResolve(x.data.value);
         }
+        document.getElementById("evalScript").src = `eval.html?v=${(new Date()).getTime()}`;
     }else{
         exec_action(x.data, x.source);
     }
