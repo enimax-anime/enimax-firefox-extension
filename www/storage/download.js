@@ -157,7 +157,7 @@ class DownloadVid {
         });
 
 
-        if (this.engine == 3) {
+        if (this.engine == 3 && config.sockets) {
             let socket = io(extensionList[3].config.socketURL, { transports: ["websocket"] });
             socket.on("connect", () => {
                 self.sid = socket.id;
@@ -856,7 +856,7 @@ class DownloadVid {
                             continue;
                         }
 
-                        if (self.engine == 3) {
+                        if (self.engine == 3 && config.sockets) {
                             promises.push(self.downloadFileTransfer(mapping[j].fileName, mapping[j].uri, self, {
                                 "headers": {
                                 "origin": extensionList[3].config.origin,
