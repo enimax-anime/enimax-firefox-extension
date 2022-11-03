@@ -6,14 +6,17 @@
   --theme-color: #d66868;
 }
 
+* {
+  text-rendering: geometricPrecision;
+}
 
-body {
+/* body {
   margin: 0;
   background-color: var(--theme-color);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 800'%3E%3Cg %3E%3Ccircle fill='%23ffffff22' cx='400' cy='400' r='600'/%3E%3Ccircle fill='%2300000022' cx='400' cy='400' r='500'/%3E%3Ccircle fill='%2300000022' cx='400' cy='400' r='400'/%3E%3Ccircle fill='%23ffffff22' cx='400' cy='400' r='300'/%3E%3Ccircle fill='%23ffffff22' cx='400' cy='400' r='200'/%3E%3Ccircle fill='%23ffffff22' cx='400' cy='400' r='100'/%3E%3C/g%3E%3C/svg%3E");
   background-attachment: fixed;
   background-size: cover;
-}
+} */
 
 div {
   user-select: none;
@@ -697,7 +700,8 @@ display: inline-block;
   position: fixed;
   top: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -709,12 +713,13 @@ display: inline-block;
   position: fixed;
   top: 20px;
   right: 20px;
-  height: 30px;
-  width: 30px;
-
-  background-image: url("data:image/svg+xml,%0A%3Csvg height='426.66667pt' fill='white' viewBox='0 0 426.66667 426.66667' width='426.66667pt' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m405.332031 192h-170.664062v-170.667969c0-11.773437-9.558594-21.332031-21.335938-21.332031-11.773437 0-21.332031 9.558594-21.332031 21.332031v170.667969h-170.667969c-11.773437 0-21.332031 9.558594-21.332031 21.332031 0 11.777344 9.558594 21.335938 21.332031 21.335938h170.667969v170.664062c0 11.777344 9.558594 21.335938 21.332031 21.335938 11.777344 0 21.335938-9.558594 21.335938-21.335938v-170.664062h170.664062c11.777344 0 21.335938-9.558594 21.335938-21.335938 0-11.773437-9.558594-21.332031-21.335938-21.332031zm0 0'/%3E%3C/svg%3E");
-  background-size: 100% 100%;
+  height: 40px;
+  width: 40px;
+  background: white;
+  background-image: url("data:image/svg+xml,%0A%3Csvg height='426.66667pt' fill='black' viewBox='0 0 426.66667 426.66667' width='426.66667pt' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m405.332031 192h-170.664062v-170.667969c0-11.773437-9.558594-21.332031-21.335938-21.332031-11.773437 0-21.332031 9.558594-21.332031 21.332031v170.667969h-170.667969c-11.773437 0-21.332031 9.558594-21.332031 21.332031 0 11.777344 9.558594 21.335938 21.332031 21.335938h170.667969v170.664062c0 11.777344 9.558594 21.335938 21.332031 21.335938 11.777344 0 21.335938-9.558594 21.335938-21.335938v-170.664062h170.664062c11.777344 0 21.335938-9.558594 21.335938-21.335938 0-11.773437-9.558594-21.332031-21.335938-21.332031zm0 0'/%3E%3C/svg%3E");
+  background-size: 20px 20px;
   background-position: center;
+  border-radius: 20px;
   background-repeat: no-repeat;
   transform: rotate(-45deg);
 
@@ -740,7 +745,7 @@ display: inline-block;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   padding: 30px;
-  font-size: 17px;
+  font-size: 15px;
   -webkit-transition-duration: 0.2s;
   -o-transition-duration: 0.2s;
   transition-duration: 0.2s;
@@ -790,7 +795,7 @@ display: inline-block;
   background-color: white;
   box-sizing: border-box;
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 50px;
   text-align: center;
   font-family: 'Montserrat', sans-serif;
 
@@ -819,7 +824,7 @@ display: inline-block;
   height: 40px;
   width: 40px;
   margin-left: 5px;
-  background-color: grey;
+  background-color: black;
   border-radius: 100%;
   display: inline-block;
   vertical-align: middle;
@@ -829,7 +834,7 @@ display: inline-block;
   height: 40px;
   width: 40px;
   margin-left: 5px;
-  background-color: grey;
+  background-color: black;
   border-radius: 100%;
   display: inline-block;
   vertical-align: middle;
@@ -920,6 +925,7 @@ display: inline-block;
   position: absolute;
   top: 0;
   left: 0;
+  /* transition-duration: 0.2s; */
 }
 
 #mainCon {
@@ -957,6 +963,7 @@ display: inline-block;
   background-repeat: no-repeat;
   border-radius : 15px;
   flex-shrink:0; 
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 .episodesTitle{
   color:white;
@@ -981,6 +988,8 @@ display: inline-block;
   background-size: 20px 20px;
   background-position:center;
   background-repeat: no-repeat;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+
 }
 
 .episodesBroken{
@@ -994,6 +1003,8 @@ display: inline-block;
   background-size: 20px 20px;
   background-position:center;
   background-repeat: no-repeat;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+
 }
 .episodesDownloaded{
   height:40px;
@@ -1006,6 +1017,8 @@ display: inline-block;
   background-size: 20px 20px;
   background-position:center;
   background-repeat: no-repeat;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+
 }
 
 
@@ -1020,6 +1033,8 @@ display: inline-block;
   background-size: 20px 20px;
   background-position:center;
   background-repeat: no-repeat;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+
 }
 
 
@@ -1034,6 +1049,8 @@ display: inline-block;
   background-size: 20px 20px;
   background-position:center;
   background-repeat: no-repeat;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+
 }
 
 .switch {
@@ -1053,6 +1070,8 @@ display: inline-block;
   position: absolute;
   cursor: pointer;
   top: 0;
+  border: 3px solid white;
+  box-sizing: content-box;
   left: 0;
   right: 0;
   bottom: 0;
@@ -1064,10 +1083,10 @@ display: inline-block;
 .slider:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
+  height: 23px;
+  width: 23px;
+  left: 2px;
+  bottom: 2.25px;
   background-color: white;
   -webkit-transition: 0.2s;
   transition: 0.2s;
@@ -1097,3 +1116,26 @@ input:checked+.slider:before {
 }
 
 
+.accessTable{
+  display: table;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  border-spacing: 16px;
+  border-collapse: separate;
+}
+.accessItem {
+  padding: 15px;
+  display: table-row;
+  text-align: left;
+}
+
+.tableCell{
+  display: table-cell;
+  vertical-align: middle;
+  padding : 10px 0 10px 0;
+}
+
+.tableCellNoPadding{
+  padding: 0 !important;
+}

@@ -947,6 +947,8 @@ function exec_action(x, reqSource) {
 
 
 
+    }else if(x.action == "updateGrad"){
+        updateGradient(parseInt(x.data));
     }
 
 }
@@ -1058,3 +1060,4 @@ if (config.chrome) {
 }
 
 updateTheme();
+setGradient();

@@ -7,13 +7,15 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' blob:; object-src 'self'">
 	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
-	<link href="index.css" rel="stylesheet">
 	<link href="../../notification/noti.css" rel="stylesheet">
 	<link href="../../assets/index.css" rel="stylesheet">
+	<link href="index.css" rel="stylesheet">
+	
 	<script src="../../assets/socket.js" ></script>
 
 	<script type="text/javascript" src="../../assets/config.js"></script>
 	<script src="../../assets/hls.js"></script>
+	<script src="../../assets/pull.js"></script>
 	<script type="text/javascript" src="../../notification/noti.js"></script>
 	<script type="text/javascript" src="../../assets/index.js"></script>
 
@@ -33,114 +35,165 @@
 
 		<div id="con_2">
 			<div id="setting_con">
+				<div id="settingHandleCon">
+					<div id="settingHandlePadding">
+						<div id="settingHandle"></div>					
+					</div>
+				</div>
 				<div style="width: 20px;position: absolute;top: 0;display: inline-block;font-size: 20px;color: white;text-align: right;top: 10px;right: 10px;box-sizing: border-box;z-index: 5;" 	id="closeSetting">&#10005;</div>
 
-				<div style="width:100%;padding: 30px; box-sizing: border-box;" id="setting_con_main">
+				<div style="width:100%; box-sizing: border-box;" id="setting_con_main">
 
-					<div id="qualityTitle" class="settingTitle">Quality: </div>
-					<div id="hls_con" class="bottomMargin"></div>
-					<hr id="qualityHr" class="divider" />
+					<div class="accessTable">
+						<div class="accessItem">
+							<div class="tableCell">
+								<div id="qualityTitle" class="settingTitle">Quality: </div>
+							</div>
 
-
-					<div id="sourceTitle" class="settingTitle" style="display: block !important">Source: </div>
-					<div id="quality_con" class="bottomMargin"></div>
-					<hr id="sourceHr" class="divider" />
-					
-
-					<div id="subtitleTitle" class="settingTitle">Subtitles: </div>
-					<div id="sub_con" class="bottomMargin"></div>
-					<hr id="subtitleHr" class="divider" />
-
-
-					<div style="display: inline-block;" class="bottomMargin">
-						<span style="color:white;display: inline-block;vertical-align: middle;margin-right: 15px;">Autoplay
-							: </span>
-						<label class="switch" style="vertical-align: middle;">
-							<input type="checkbox" id="autoplay">
-							<span class="slider round"></span>
-						</label>
-					</div>
-
-
-					<div style="display: inline-block;" class="bottomMargin">
-
-						<span style="color:white;display: inline-block;vertical-align: middle;margin-right: 15px;">Rewatch mode
-							: </span>
-						<label class="switch" style="vertical-align: middle;">
-							<input type="checkbox" id="rewatch">
-							<span class="slider round"></span>
-						</label>
-					</div>
-
-					<hr class="divider" />
-
-
-					<div style="display: inline-block;" class="bottomMargin">
-						<span style="color:white;display: inline-block;vertical-align: middle;margin-right: 15px;">Hide Skip Intro
-							: </span>
-						<label class="switch" style="vertical-align: middle;">
-							<input type="checkbox" id="showIntroSlider">
-							<span class="slider round"></span>
-						</label>
-					</div>
-
-
-					<div style="display: inline-block;" class="bottomMargin">
-
-						<span style="color:white;display: inline-block;vertical-align: middle;margin-right: 15px;">Automatically Skip Intro
-							: </span>
-						<label class="switch" style="vertical-align: middle;">
-							<input type="checkbox" id="autoIntroSlider">
-							<span class="slider round"></span>
-						</label>
-					</div>
-
-					<hr class="divider" />
-
-
-					<div style="color: white;margin-top: 15px;">
-						<div style="display: inline-block;" class="bottomMargin">Double tap time :  <input type="text"  class="textBox" id="doubleTime" /></div>
-						<div style="display: inline-block;" class="bottomMargin">Skip button time :  <input type="text"  class="textBox" id="skipTime" /></div>
-						<div style="display: inline-block;" class="bottomMargin">Subtitle Margin (Tip: try negative numbers) :  <input type="number"  class="textBox" id="subMar" /></div>
-					</div> 
-
-					<hr class="divider" />
-
-					<div id="sourceTitle" class="settingTitle" style="display: block !important">Fill mode: </div>
-
-					<div id="playerFit" class="bottomMargin">
-						<div class="qual fit" data-num = "0">
-							Normal
+							<div class="tableCell">
+								<div id="hls_con" class="bottomMargin"></div>
+							</div>
 						</div>
-						<div class="qual fit" data-num = "1">
-							Stretch
+
+
+						<div class="accessItem">
+							<div class="tableCell">
+								<div id="sourceTitle" class="settingTitle" style="display: block !important">Source: </div>
+							</div>
+
+							<div class="tableCell">
+								<div id="quality_con" class="bottomMargin"></div>
+							</div>
 						</div>
-						<div class="qual fit" data-num = "2">
-							Subtitles
+
+
+						<div class="accessItem">
+							<div class="tableCell">
+								<div class="settingTitle" id="sourceTitle">Fill mode:</div>								
+							</div>
+
+							<div class="tableCell">
+								<div id="playerFit" class="bottomMargin">
+									<div class="qual fit" data-num = "0">
+										Normal
+									</div>
+									<div class="qual fit" data-num = "1">
+										Stretch
+									</div>
+									<div class="qual fit" data-num = "2">
+										Subtitles
+									</div>
+									<div class="qual fit" data-num = "3">
+										Fill
+									</div>
+								</div>
+							</div>
 						</div>
-						<div class="qual fit" data-num = "3">
-							Fill
+
+						<div class="accessItem">
+							<div class="tableCell">
+								<div id="subtitleTitle" class="settingTitle">Subtitles: </div>
+							</div>
+
+							<div class="tableCell">
+								<div id="sub_con" class="bottomMargin"></div>
+							</div>
+						</div>
+
+						<div class="accessItem">
+							<div class="tableCell">
+								<div class="settingTitle">Autoplay: </div>
+							</div>
+
+							<div class="tableCell">
+								<label class="switch" style="vertical-align: middle;">
+									<input type="checkbox" id="autoplay">
+									<span class="slider round"></span>
+								</label>
+							</div>
+						</div>
+
+						<div class="accessItem">
+							<div class="tableCell">
+								<div class="settingTitle">Rewatch mode: </div>
+							</div>
+
+							<div class="tableCell">
+								<label class="switch" style="vertical-align: middle;">
+									<input type="checkbox" id="rewatch">
+									<span class="slider round"></span>
+								</label>
+							</div>
+						</div>
+
+						<div class="accessItem">
+							<div class="tableCell">
+								<div class="settingTitle">Hide Skip Intro:</div>
+							</div>
+
+							<div class="tableCell">
+								<label class="switch" style="vertical-align: middle;">
+									<input type="checkbox" id="showIntroSlider">
+									<span class="slider round"></span>
+								</label>
+							</div>
+						</div>
+
+
+						<div class="accessItem">
+							<div class="tableCell">
+								<div class="settingTitle">Automatically Skip Intro: </div>
+							</div>
+
+							<div class="tableCell">
+								<label class="switch" style="vertical-align: middle;">
+									<input type="checkbox" id="autoIntroSlider">
+									<span class="slider round"></span>
+								</label>
+							</div>
+						</div>
+
+
+						<div class="accessItem">
+							<div class="tableCell">
+								<div class="settingTitle">Double tap time:</div>								
+							</div>
+
+							<div class="tableCell">
+								<input type="text"  class="textBox" id="doubleTime" />
+							</div>
+						</div>
+
+
+						<div class="accessItem">
+							<div class="tableCell">
+								<div class="settingTitle">Skip button time: </div>								
+							</div>
+
+							<div class="tableCell">
+								<input type="text"  class="textBox" id="skipTime" />
+							</div>
+						</div>
+
+						<div class="accessItem">
+							<div class="tableCell">
+								<div class="settingTitle">Subtitle Margin <br />(Tip: try negative numbers) : </div>								
+							</div>
+
+							<div class="tableCell">
+								<input type="number"  class="textBox" id="subMar" />
+							</div>
 						</div>
 					</div>
-
-					<hr class="divider" />
-
-
-					
 				</div>
 			</div>
 			<video id="v" playsinline poster="../../assets/images/anime2.png">
 			</video>
 			
 			<div id="pop">
-
 				<div style="width: 100%;font-size: 25px;color: white;font-weight: bolder;text-align: left;	box-sizing: border-box;	margin: 15px 0px 0px 25px;" id="epCon">
 					Episode <span id="ep_dis"></span>
-				</div>
-
-
-				
-
+				</div>		
 			</div>
 			<div id="options">
 				<div style="display: table-cell;vertical-align: middle;">
@@ -214,12 +267,6 @@
 					<div style="display: table-cell;vertical-align: middle;">
 						<div id="fullscreen"></div>
 					</div>
-
-
-
-					
-
-
 
 					<div style="display: table-cell;vertical-align: middle;">
 						<div id="lock"></div>

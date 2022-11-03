@@ -13,11 +13,6 @@
     rel="stylesheet">
   <link href="../../assets/index.css" rel="stylesheet">
   <style>
-    body {
-      background-color: #101010;
-      background-image: none !important;
-    }
-
     #settingsCon {
       display: block;
       white-space: nowrap;
@@ -73,6 +68,7 @@
       left: 0;
       z-index: 1;
       background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
     }
 
     #imageTitle {
@@ -81,6 +77,7 @@
       color: white;
       margin: 10px 20px 10px 20px;
       line-height: 40px;
+      /* backdrop-filter: blur(5px); */
     }
 
     .infoCon {
@@ -90,7 +87,6 @@
       left: 0;
       width: 100%;
       min-height: var(--image-min-height);
-
 
     }
 
@@ -105,6 +101,7 @@
       min-height: var(--image-min-height);
       display: flex;
       align-items: center;
+      /* backdrop-filter: blur(5px); */
 
     }
 
@@ -121,6 +118,7 @@
       background-position: center;
       background-repeat: no-repeat;
       background-size: 30px 30px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
 
     }
