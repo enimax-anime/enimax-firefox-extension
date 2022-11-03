@@ -1,6 +1,6 @@
 {
   "name": "Enimax",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "",
   "permissions": ["webRequest","webRequestBlocking","https://*/","http://*/"],
   "options_ui": {

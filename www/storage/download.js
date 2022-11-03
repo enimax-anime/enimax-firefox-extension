@@ -866,7 +866,11 @@ class DownloadVid {
                             }));
 
                         } else {
-                            promises.push(self.downloadFileTransfer(mapping[j].fileName, mapping[j].uri, self, {}));
+                            promises.push(self.downloadFileTransfer(mapping[j].fileName, mapping[j].uri, self, {
+                                "headers": {
+                                    "user-agent": navigator.userAgent,
+                                }
+                            }));
 
                         }
                     }

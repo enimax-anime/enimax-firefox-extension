@@ -1666,7 +1666,6 @@ function loadSubs() {
 	}
 	document.getElementById("sub_con").innerHTML = "";
 	document.getElementById("subtitleTitle").style.display = "none";
-	document.getElementById("subtitleHr").style.display = "none";
 	if ("subtitles" in data_main && data_main["subtitles"].length > 0) {
 		let selectDOM = createElement({
 			"element": "select"
@@ -1680,7 +1679,6 @@ function loadSubs() {
 			"innerText": "off"
 		}));
 		document.getElementById("subtitleTitle").style.display = "block";
-		document.getElementById("subtitleHr").style.display = "block";
 
 		for (var i = 0; i < data_main.subtitles.length; i++) {
 			let optionDOM = createElement({
@@ -1767,7 +1765,6 @@ function chooseQual(x, type, th) {
 
 	document.getElementById("hls_con").innerHTML = "";
 	document.getElementById("qualityTitle").style.display = "none";
-	document.getElementById("qualityHr").style.display = "none";
 
 	loadSubs();
 	let defURL;
@@ -1884,7 +1881,6 @@ function loadHLSsource() {
 		qCon.innerHTML = "";
 
 		document.getElementById("qualityTitle").style.display = "block";
-		document.getElementById("qualityHr").style.display = "block";
 
 
 		let hlsqualnum = parseInt(localStorage.getItem("hlsqualnum"));
@@ -2281,3 +2277,25 @@ document.getElementById("skipIntroDOM").onclick = function(){
 	}
 }
 applyTheme();
+
+function closeSettings(){
+	let settingCon = document.getElementById("setting_con");
+	settingCon.style.transitionDuration = "0.2s";
+	settingCon.style.transform = "translateY(0px)";
+
+	window.requestAnimationFrame(function(){
+		window.requestAnimationFrame(function(){
+			settingCon.style.transform = "translateY(200px)";
+			settingCon.style.opacity = "0";
+			setTimeout(function(){
+				settingCon.style.transform = "translateY(0px)";
+				settingCon.style.opacity = "1";
+				settingCon.style.height = "60%";
+				settingCon.style.display = "none";
+				settingCon.style.transitionDuration = "0s";
+			},200);
+		});
+	});
+}
+
+let settingsPullInstance = new settingsPull(document.getElementById("settingHandlePadding"), closeSettings);

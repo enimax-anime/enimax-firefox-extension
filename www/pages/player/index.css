@@ -471,6 +471,7 @@ div {
 
 .range-input input {
     -webkit-appearance: none;
+    appearance: none;
     width: 200px;
     height: 2px;
     background-color: #4471ef;
@@ -479,6 +480,7 @@ div {
 
 .range-input input::-webkit-slider-thumb {
     -webkit-appearance: none;
+    appearance: none;
     width: 20px;
     height: 20px;
     background-color: #eee;
@@ -493,9 +495,9 @@ div {
 
 #setting_con_main {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
-    height: 100%;
+    height: calc(100% - 50px);
     width: 100%;
     overflow-y: auto;
     z-index: 1;
@@ -511,56 +513,6 @@ div {
     margin: 5px;
 }
 
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: 0.2s;
-    transition: 0.2s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: 0.2s;
-    transition: 0.2s;
-}
-
-input:checked+.slider {
-    background-color: #2196F3;
-}
-
-input:focus+.slider {
-    box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked+.slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-}
 
 #skipIntroDOM{
     display: none;
@@ -572,13 +524,6 @@ input:checked+.slider:before {
     padding: 10px;
     background-color: rgba(0,0,0,0.5);
     color: white;
-}
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
 }
 
 .replay {
@@ -603,19 +548,11 @@ input:checked+.slider:before {
     display: table;
 }
 
-.bottomMargin{
-    margin: 20px;
-    background: black;
-    padding: 15px;
-    display: inline-block;
-    border-radius: 10px;
-}
-
 select{
-    -webkit-appearance:none;
-    -moz-appearance:none;
-    -ms-appearance:none;
-    appearance:none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    appearance: none;
     background: white;
     font-family: 'Montserrat', sans-serif;
     padding: 10px;
@@ -623,12 +560,11 @@ select{
     font-weight: 900;
     border-radius: 10px;
     font-size: 15px;
+    border-radius: 25px;
 }
 
 .settingTitle{
     color: white;
-    margin-top: 20px;
-    display: none;
 }
 
 .divider{
@@ -655,14 +591,57 @@ select{
 
 .textBox {
     display: inline-block;
-    border-radius: 10px;
+    border-radius: 30px;
+    text-align: center;
     height: 20px;
     padding: 10px;
     margin: 10px;
-    border: 0;
     width: 100px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bolder;
+    border: 5px solid #d8c9c9;
 }
 
 #doubleTime{
     margin-right: 10px;
+}
+
+.tableCell{
+    text-align: start;
+}
+.settingTitle{
+    text-align: end !important;
+    display: block;
+}
+
+#sub_con select{
+    width: 240px;
+}
+
+#settingHandleCon{
+    width: 100%;
+    height: 20px;
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    text-align: center;
+    box-sizing: border-box;
+    z-index: 5;
+}
+
+#settingHandle{
+    height: 10px;
+    width: 50px;
+    background-color: white;
+    border-radius: 10px;
+}
+
+#settingHandlePadding{
+    display: inline-block;
+    padding: 20px;
+}
+
+.accessTable{
+    padding: 0px !important;
 }
